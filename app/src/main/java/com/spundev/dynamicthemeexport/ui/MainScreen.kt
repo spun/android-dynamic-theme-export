@@ -20,70 +20,48 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.spundev.dynamicthemeexport.R
 import com.spundev.dynamicthemeexport.data.ThemeColorPack
 import com.spundev.dynamicthemeexport.ui.export.ExportScreen
 import com.spundev.dynamicthemeexport.ui.preview.ColorRolesTable
-import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    isDarkTheme: Boolean = isSystemInDarkTheme(),
+    themeColorPack: ThemeColorPack,
+    onDarkThemeChange: (isDarkTheme: Boolean) -> Unit,
+) {
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.systemBarsPadding()) {
 
-    // Start with the current system theme and allow theme changes
-    val initialDarkThemeValue = isSystemInDarkTheme()
-    var isDarkThemeSelected by rememberSaveable { mutableStateOf(initialDarkThemeValue) }
+            var currentScreenIndex by rememberSaveable { mutableIntStateOf(0) }
+            MainTopBar(
+                isDarkTheme = isDarkTheme,
+                currentScreenIndex = currentScreenIndex,
+                onDarkThemeChange = onDarkThemeChange,
+                onCurrentScreenChange = { currentScreenIndex = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
 
-    // We are getting the light and dark dynamic themes here instead of inside DynamicExportTheme
-    // composable because the "Color roles" table and the export screen need both colorSchemes.
-    val context = LocalContext.current
-    val themeColorPack = remember(context) {
-        ThemeColorPack(
-            lightColorScheme = dynamicLightColorScheme(context),
-            darkColorScheme = dynamicDarkColorScheme(context)
-        )
-    }
+            HorizontalDivider()
 
-    DynamicExportTheme(
-        darkTheme = isDarkThemeSelected,
-        themeColorPack = themeColorPack,
-    ) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.systemBarsPadding()) {
-
-                var selectedScreenIndex by rememberSaveable { mutableIntStateOf(0) }
-                MainTopBar(
-                    isDarkThemeSelected = isDarkThemeSelected,
-                    selectedScreenIndex = selectedScreenIndex,
-                    onThemeChange = { isDarkThemeSelected = it },
-                    onScreenSelectionChange = { selectedScreenIndex = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                )
-
-                HorizontalDivider()
-
-                // Screen content
-                when (selectedScreenIndex) {
-                    0 -> ColorRolesTable(themeColorPack = themeColorPack)
-                    1 -> ExportScreen(themeColorPack = themeColorPack)
-                    else -> Text("Unknown")
-                }
+            // Screen content
+            when (currentScreenIndex) {
+                0 -> ColorRolesTable(themeColorPack = themeColorPack)
+                1 -> ExportScreen(themeColorPack = themeColorPack)
+                else -> Text("Unknown")
             }
         }
     }
@@ -91,10 +69,10 @@ fun MainScreen() {
 
 @Composable
 private fun MainTopBar(
-    isDarkThemeSelected: Boolean,
-    selectedScreenIndex: Int,
-    onThemeChange: (isDarkSelected: Boolean) -> Unit,
-    onScreenSelectionChange: (index: Int) -> Unit,
+    isDarkTheme: Boolean,
+    currentScreenIndex: Int,
+    onDarkThemeChange: (isDarkTheme: Boolean) -> Unit,
+    onCurrentScreenChange: (index: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -103,13 +81,13 @@ private fun MainTopBar(
         modifier = modifier
     ) {
         ScreenContentSelector(
-            selectedIndex = selectedScreenIndex,
-            onSelectionChange = onScreenSelectionChange
+            currentScreenIndex = currentScreenIndex,
+            onCurrentScreenChange = onCurrentScreenChange
         )
 
         LightDarkSelector(
-            isDarkThemeSelected = isDarkThemeSelected,
-            onThemeChange = onThemeChange
+            isDarkTheme = isDarkTheme,
+            onDarkThemeChange = onDarkThemeChange
         )
     }
 }
@@ -117,8 +95,8 @@ private fun MainTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ScreenContentSelector(
-    selectedIndex: Int,
-    onSelectionChange: (Int) -> Unit,
+    currentScreenIndex: Int,
+    onCurrentScreenChange: (index: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val options = listOf("Preview", "Export")
@@ -129,8 +107,8 @@ private fun ScreenContentSelector(
                     index = index,
                     count = options.size
                 ),
-                onClick = { onSelectionChange(index) },
-                selected = index == selectedIndex
+                onClick = { onCurrentScreenChange(index) },
+                selected = index == currentScreenIndex
             ) {
                 Text(label)
             }
@@ -140,19 +118,19 @@ private fun ScreenContentSelector(
 
 @Composable
 private fun LightDarkSelector(
-    isDarkThemeSelected: Boolean,
-    onThemeChange: (isDarkSelected: Boolean) -> Unit,
+    isDarkTheme: Boolean,
+    onDarkThemeChange: (isDarkTheme: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val iconDrawableRes = if (isDarkThemeSelected) {
+    val iconDrawableRes = if (isDarkTheme) {
         R.drawable.ic_dark_mode_24
     } else {
         R.drawable.ic_light_mode_24
     }
 
     Switch(
-        checked = !isDarkThemeSelected,
-        onCheckedChange = { onThemeChange(!it) },
+        checked = !isDarkTheme,
+        onCheckedChange = { onDarkThemeChange(!it) },
         thumbContent = {
             // Icon isn't focusable, no need for content description
             Icon(
