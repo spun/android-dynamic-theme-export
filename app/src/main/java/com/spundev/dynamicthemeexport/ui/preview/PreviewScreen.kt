@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -177,6 +178,8 @@ fun ColorRolesTable(
         }
 
         SurfaceSection()
+
+        DeprecatedSection()
     }
 }
 
@@ -566,7 +569,7 @@ private fun SurfaceSection() {
                     Text(
                         text = "Scrim",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.surface
+                        color = Color.White
                     )
                 }
                 Box(
@@ -578,11 +581,62 @@ private fun SurfaceSection() {
                         .padding(ColorCellContentPadding)
                 ) {
                     Text(
-                        text = "Shadow *",
+                        text = "Shadow?",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White
                     )
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Colors available inside MaterialTheme.colorScheme that don't have a dedicated section in the
+ * "Color Roles" table
+ */
+@Composable
+private fun DeprecatedSection() {
+    Column {
+        Text(
+            text = "> DEPRECATED",
+            style = MaterialTheme.typography.bodySmall,
+        )
+
+        Spacer(modifier = Modifier.height(ColorTableSectionPadding))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
+            ColorBlockSimple(
+                text = "Background",
+                color = MaterialTheme.colorScheme.background,
+            )
+
+            Box(
+                modifier = Modifier
+                    .height(ColorTableBigCellHeight)
+                    .width(ColorCellWidth)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(ColorCellContentPadding)
+            ) {
+                Text(
+                    text = "Surface variant",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .height(ColorTableBigCellHeight)
+                    .width(ColorCellWidth)
+                    .background(MaterialTheme.colorScheme.surfaceTint)
+                    .padding(ColorCellContentPadding)
+            ) {
+                Text(
+                    text = "Surface tint",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.surface
+                )
             }
         }
     }
