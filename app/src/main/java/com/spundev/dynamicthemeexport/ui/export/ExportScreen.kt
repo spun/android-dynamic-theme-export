@@ -2,6 +2,7 @@ package com.spundev.dynamicthemeexport.ui.export
 
 import android.content.Intent
 import android.graphics.Typeface
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -76,7 +77,10 @@ fun ExportScreen(
             FilledTonalIconButton(
                 onClick = {
                     clipboardManager.setText(AnnotatedString(themeColorPackOutput))
-                    Toast.makeText(context, "Text copied", Toast.LENGTH_SHORT).show()
+                    // Only show a toast for Android 12 (32) and lower.
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                        Toast.makeText(context, "Text copied", Toast.LENGTH_SHORT).show()
+                    }
                 }
             ) {
                 Icon(
