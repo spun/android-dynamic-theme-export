@@ -37,10 +37,10 @@ sealed class ColorFormat(val formatter: (Color) -> String) {
             number.removeLeadingZeros = true
         }
         "Color(" +
-                "red = 0x${color.red.toHexString(customHexFormat)}, " +
-                "green = 0x${color.green.toHexString(customHexFormat)}, " +
-                "blue = 0x${color.blue.toHexString(customHexFormat)}" +
-                ")"
+            "red = 0x${color.red.toHexString(customHexFormat).padStart(2, '0')}, " +
+            "green = 0x${color.green.toHexString(customHexFormat).padStart(2, '0')}, " +
+            "blue = 0x${color.blue.toHexString(customHexFormat).padStart(2, '0')}" +
+        ")"
     })
 
     /**
