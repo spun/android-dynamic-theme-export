@@ -14,13 +14,14 @@ data class ThemeColorPack(
     val darkColorScheme: ColorScheme
 ) {
 
-    @OptIn(ExperimentalStdlibApi::class)
-    suspend fun toComposeThemeFile(): String = withContext(Dispatchers.Default) {
+    suspend fun toComposeThemeFile(
+        colorFormat: ColorFormat
+    ): String = withContext(Dispatchers.Default) {
         buildString {
             // Light theme
             appendLine("val light = lightColorScheme(")
-            lightColorScheme.toColorStringMap().forEach { (key, value) ->
-                appendLine("    $key = Color(0x${value.toHexString(HexFormat.UpperCase)}),")
+            lightColorScheme.toColorStringMap(colorFormat).forEach { (key, value) ->
+                appendLine("    $key = $value,")
             }
             appendLine(")")
 
@@ -28,8 +29,8 @@ data class ThemeColorPack(
 
             // Dark theme
             appendLine("val dark = darkColorScheme(")
-            darkColorScheme.toColorStringMap().forEach { (key, value) ->
-                appendLine("    $key = Color(0x${value.toHexString(HexFormat.UpperCase)}),")
+            darkColorScheme.toColorStringMap(colorFormat).forEach { (key, value) ->
+                appendLine("    $key = $value,")
             }
             appendLine(")")
         }
