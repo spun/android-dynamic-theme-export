@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Check
@@ -105,11 +106,13 @@ fun ExportScreen(
                 .background(MaterialTheme.colorScheme.secondaryContainer)
                 .freeScroll(rememberFreeScrollState())
         ) {
-            Text(
-                text = themeColorPackOutput,
-                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily(Typeface.MONOSPACE)),
-                modifier = Modifier.padding(8.dp)
-            )
+            SelectionContainer {
+                Text(
+                    text = themeColorPackOutput,
+                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily(Typeface.MONOSPACE)),
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
         }
     }
 }
