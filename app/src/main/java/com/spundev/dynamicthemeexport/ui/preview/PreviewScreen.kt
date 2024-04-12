@@ -31,6 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.spundev.dynamicthemeexport.data.ThemeColorPack
+import com.spundev.dynamicthemeexport.data.TintedSurfaceContainers
+import com.spundev.dynamicthemeexport.ext.getTintedSurfaceColors
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 import com.spundev.dynamicthemeexport.util.freeScroll.freeScrollWithTransformGesture
 import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
@@ -76,6 +78,12 @@ fun ColorRolesTable(
             onSecondaryFixedVariant = light.secondary,
             onTertiaryFixedVariant = light.tertiary,
         )
+    }
+
+    // Tinted alternative to the default surfaceContainer colors
+    val currentColorScheme = MaterialTheme.colorScheme
+    val tintedSurfaceContainers = remember(currentColorScheme) {
+        currentColorScheme.getTintedSurfaceColors()
     }
 
     var zoom: Float by remember { mutableFloatStateOf(1f) }
@@ -180,6 +188,8 @@ fun ColorRolesTable(
         SurfaceSection()
 
         DeprecatedSection()
+
+        TintedSurfaceContainerSection(tintedSurfaceContainers)
     }
 }
 
@@ -636,6 +646,98 @@ private fun DeprecatedSection() {
                     text = "Surface tint",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.surface
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Tinted alternative to the default surfaceContainer colors
+ */
+@Composable
+private fun TintedSurfaceContainerSection(colors: TintedSurfaceContainers) {
+    Column {
+        Text(
+            text = "> LEGACY TINTED SURFACE CONTAINERS",
+            style = MaterialTheme.typography.bodySmall,
+        )
+
+        Spacer(modifier = Modifier.height(ColorTableSectionPadding))
+
+        // The surface section has the width of 3 cell blocks without any padding in between
+        val surfaceSectionWidth = ((ColorCellWidth * 3) + (ColorTableCellPadding * 2))
+
+        Row(
+            modifier = Modifier
+                .width(surfaceSectionWidth)
+                .height(ColorTableBigCellHeight)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .background(colors.surfaceContainerLowest)
+                    .padding(ColorCellContentPadding)
+            ) {
+                Text(
+                    text = "Surface Container Lowest",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .background(colors.surfaceContainerLow)
+                    .padding(ColorCellContentPadding)
+            ) {
+                Text(
+                    text = "Surface Container Low",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .background(colors.surfaceContainer)
+                    .padding(ColorCellContentPadding)
+            ) {
+                Text(
+                    text = "Surface Container",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .background(colors.surfaceContainerHigh)
+                    .padding(ColorCellContentPadding)
+            ) {
+                Text(
+                    text = "Surface Container High",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .background(colors.surfaceContainerHighest)
+                    .padding(ColorCellContentPadding)
+            ) {
+                Text(
+                    text = "Surface Container Highest",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

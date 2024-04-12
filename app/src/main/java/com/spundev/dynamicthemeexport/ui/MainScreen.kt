@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -27,7 +26,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.spundev.dynamicthemeexport.R
@@ -128,6 +126,15 @@ private fun LightDarkSelector(
         R.drawable.ic_light_mode_24
     }
 
+    val switchDefaultsColors = SwitchDefaults.colors()
+    val switchColors = switchDefaultsColors.copy(
+        // Use same values from checked
+        uncheckedThumbColor = switchDefaultsColors.checkedThumbColor,
+        uncheckedTrackColor = switchDefaultsColors.checkedTrackColor,
+        uncheckedBorderColor = switchDefaultsColors.checkedBorderColor,
+        uncheckedIconColor = switchDefaultsColors.checkedIconColor
+    )
+
     Switch(
         checked = !isDarkTheme,
         onCheckedChange = { onDarkThemeChange(!it) },
@@ -139,13 +146,7 @@ private fun LightDarkSelector(
                 modifier = Modifier.size(SwitchDefaults.IconSize),
             )
         },
-        colors = SwitchDefaults.colors().copy(
-            // Use same values from checked
-            uncheckedThumbColor = MaterialTheme.colorScheme.onPrimary,
-            uncheckedTrackColor = MaterialTheme.colorScheme.primary,
-            uncheckedBorderColor = Color.Transparent,
-            uncheckedIconColor = MaterialTheme.colorScheme.onPrimaryContainer
-        ),
+        colors = switchColors,
         modifier = modifier
     )
 }

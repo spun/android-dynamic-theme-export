@@ -1,10 +1,13 @@
 package com.spundev.dynamicthemeexport.ext
 
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.ui.unit.dp
 import com.spundev.dynamicthemeexport.data.ColorFormat
+import com.spundev.dynamicthemeexport.data.TintedSurfaceContainers
 
 fun ColorScheme.toColorStringMap(colorFormat: ColorFormat): Map<String, String> {
-    return mapOf(
+    val base = mapOf(
         "primary" to colorFormat.formatter(primary),
         "onPrimary" to colorFormat.formatter(onPrimary),
         "primaryContainer" to colorFormat.formatter(primaryContainer),
@@ -36,10 +39,35 @@ fun ColorScheme.toColorStringMap(colorFormat: ColorFormat): Map<String, String> 
         "scrim" to colorFormat.formatter(scrim),
         "surfaceBright" to colorFormat.formatter(surfaceBright),
         "surfaceDim" to colorFormat.formatter(surfaceDim),
+        "surfaceContainerLowest" to colorFormat.formatter(surfaceContainerLowest),
+        "surfaceContainerLow" to colorFormat.formatter(surfaceContainerLow),
         "surfaceContainer" to colorFormat.formatter(surfaceContainer),
         "surfaceContainerHigh" to colorFormat.formatter(surfaceContainerHigh),
         "surfaceContainerHighest" to colorFormat.formatter(surfaceContainerHighest),
-        "surfaceContainerLow" to colorFormat.formatter(surfaceContainerLow),
-        "surfaceContainerLowest" to colorFormat.formatter(surfaceContainerLowest),
+    )
+
+    val tintedSurfaceColors = getTintedSurfaceColors()
+    val tintedSurfaceContainers = mapOf(
+        "// surfaceContainerLowest" to colorFormat.formatter(tintedSurfaceColors.surfaceContainerLowest),
+        "// surfaceContainerLow" to colorFormat.formatter(tintedSurfaceColors.surfaceContainerLow),
+        "// surfaceContainer" to colorFormat.formatter(tintedSurfaceColors.surfaceContainer),
+        "// surfaceContainerHigh" to colorFormat.formatter(tintedSurfaceColors.surfaceContainerHigh),
+        "// surfaceContainerHighest" to colorFormat.formatter(tintedSurfaceColors.surfaceContainerHighest),
+    )
+
+    return base + tintedSurfaceContainers
+}
+
+/**
+ * Generate a tinted alternative to the default surfaceContainer colors.
+ * More info [TintedSurfaceContainers]
+ */
+internal fun ColorScheme.getTintedSurfaceColors(): TintedSurfaceContainers {
+    return TintedSurfaceContainers(
+        surfaceContainerLowest = surfaceColorAtElevation(1.dp),
+        surfaceContainerLow = surfaceColorAtElevation(3.dp),
+        surfaceContainer = surfaceColorAtElevation(6.dp),
+        surfaceContainerHigh = surfaceColorAtElevation(8.dp),
+        surfaceContainerHighest = surfaceColorAtElevation(12.dp),
     )
 }
