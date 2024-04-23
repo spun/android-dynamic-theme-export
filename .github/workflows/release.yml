@@ -53,10 +53,12 @@ jobs:
 
       - name: Decode Keystore 🔑
         id: keystore-recreation
+        env:
+          ENCODED_KEYSTORE: ${{ secrets.SIGNING_KEYSTORE }}
         run: |
           KS_RECREATION_WORK_PATH="${RUNNER_TEMP}"/keystore
           mkdir "${KS_RECREATION_WORK_PATH}"
-          echo ${{ secrets.SIGNING_KEYSTORE }} | base64 -di > "${KS_RECREATION_WORK_PATH}"/keystore_file.jks
+          echo "$ENCODED_KEYSTORE" | base64 -di > "${KS_RECREATION_WORK_PATH}"/keystore_file.jks
           echo "KEYSTORE_FILE_PATH=${KS_RECREATION_WORK_PATH}/keystore_file.jks" >> "$GITHUB_OUTPUT"
 
       - name: Build release variant 🏗️
