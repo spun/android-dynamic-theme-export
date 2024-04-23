@@ -5,7 +5,7 @@ This simple Compose app allows you to preview and export the available colors fr
 
 ## How to install
 
-- **Option 1:** Download the latest APK from the releases page.
+- **Option 1:** Download the [latest APK from the releases page](https://github.com/spun/android-dynamic-theme-export/releases/latest).
 - **Option 2:** Clone the repository and run the app like any other Android project.
 
 **NOTE:** This app depends on dynamic themes to work and it can only be installed on devices running [Android 12 (API level 31) or higher](https://developer.android.com/develop/ui/views/theming/dynamic-colors).
