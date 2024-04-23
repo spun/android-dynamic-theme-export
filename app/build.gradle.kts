@@ -12,11 +12,23 @@ android {
         minSdk = 31
         targetSdk = 34
         versionCode = 1
-        versionName = "0.0.1-dev"
+        versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            val storePath = System.getenv("SIGNING_STORE_PATH")
+            storePath?.let {
+                storeFile = file(storePath)
+                storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+            }
         }
     }
 
@@ -28,8 +40,29 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
+
+            // Switch to debug signingConfigs to create release builds during development
+            // signingConfig = signingConfigs.named("debug").get()
         }
     }
+
+    testOptions {
+        managedDevices {
+            localDevices {
+                create("pixel2api32") {
+                    // Use device profiles you typically see in Android Studio.
+                    device = "Pixel 2"
+                    // Use only API levels 27 and higher.
+                    // ATDs should support only API level 30, but this is working fine ¿?
+                    apiLevel = 32
+                    // To include Google services, use "google-atd".
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
