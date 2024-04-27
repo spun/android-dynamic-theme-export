@@ -51,7 +51,8 @@ fun ColorScheme.toColorStringMap(colorFormat: ColorFormat): Map<String, String> 
         "// surfaceLevel1" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel1),
         "// surfaceLevel2" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel2),
         "// surfaceLevel3" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel3),
-        "// surfaceLevel4" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel5),
+        "// surfaceLevel4" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel4),
+        "// surfaceLevel5" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel5),
     )
 
     return base + extraSurfaceValues
