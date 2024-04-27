@@ -30,9 +30,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.spundev.dynamicthemeexport.data.ElevatedSurfaceLevels
 import com.spundev.dynamicthemeexport.data.ThemeColorPack
-import com.spundev.dynamicthemeexport.data.TintedSurfaceContainers
-import com.spundev.dynamicthemeexport.ext.getTintedSurfaceColors
+import com.spundev.dynamicthemeexport.ext.getElevatedSurfaceLevels
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 import com.spundev.dynamicthemeexport.util.freeScroll.freeScrollWithTransformGesture
 import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
@@ -80,10 +80,10 @@ fun ColorRolesTable(
         )
     }
 
-    // Tinted alternative to the default surfaceContainer colors
+    // Legacy elevated surface colors
     val currentColorScheme = MaterialTheme.colorScheme
-    val tintedSurfaceContainers = remember(currentColorScheme) {
-        currentColorScheme.getTintedSurfaceColors()
+    val elevatedSurfaceLevels = remember(currentColorScheme) {
+        currentColorScheme.getElevatedSurfaceLevels()
     }
 
     var zoom: Float by remember { mutableFloatStateOf(1f) }
@@ -189,7 +189,7 @@ fun ColorRolesTable(
 
         DeprecatedSection()
 
-        TintedSurfaceContainerSection(tintedSurfaceContainers)
+        ElevatedSurfaceLevelsSection(elevatedSurfaceLevels)
     }
 }
 
@@ -653,13 +653,13 @@ private fun DeprecatedSection() {
 }
 
 /**
- * Tinted alternative to the default surfaceContainer colors
+ * Legacy elevated surface colors
  */
 @Composable
-private fun TintedSurfaceContainerSection(colors: TintedSurfaceContainers) {
+private fun ElevatedSurfaceLevelsSection(colors: ElevatedSurfaceLevels) {
     Column {
         Text(
-            text = "> LEGACY TINTED SURFACE CONTAINERS",
+            text = "> LEGACY ELEVATED SURFACES",
             style = MaterialTheme.typography.bodySmall,
         )
 
@@ -677,11 +677,11 @@ private fun TintedSurfaceContainerSection(colors: TintedSurfaceContainers) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
-                    .background(colors.surfaceContainerLowest)
+                    .background(colors.surfaceLevel1)
                     .padding(ColorCellContentPadding)
             ) {
                 Text(
-                    text = "Surface Container Lowest",
+                    text = "Surface at +1",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -690,11 +690,11 @@ private fun TintedSurfaceContainerSection(colors: TintedSurfaceContainers) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
-                    .background(colors.surfaceContainerLow)
+                    .background(colors.surfaceLevel2)
                     .padding(ColorCellContentPadding)
             ) {
                 Text(
-                    text = "Surface Container Low",
+                    text = "Surface at +2",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -703,25 +703,11 @@ private fun TintedSurfaceContainerSection(colors: TintedSurfaceContainers) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
-                    .background(colors.surfaceContainer)
+                    .background(colors.surfaceLevel3)
                     .padding(ColorCellContentPadding)
             ) {
                 Text(
-                    text = "Surface Container",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(colors.surfaceContainerHigh)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = "Surface Container High",
+                    text = "Surface at +3",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -731,11 +717,25 @@ private fun TintedSurfaceContainerSection(colors: TintedSurfaceContainers) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
-                    .background(colors.surfaceContainerHighest)
+                    .background(colors.surfaceLevel4)
                     .padding(ColorCellContentPadding)
             ) {
                 Text(
-                    text = "Surface Container Highest",
+                    text = "Surface at +4",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .background(colors.surfaceLevel5)
+                    .padding(ColorCellContentPadding)
+            ) {
+                Text(
+                    text = "Surface at +5",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
