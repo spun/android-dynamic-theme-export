@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.spundev.dynamicthemeexport.R
 import com.spundev.dynamicthemeexport.data.ColorFormat
+import com.spundev.dynamicthemeexport.data.ColorFormatSaver
 import com.spundev.dynamicthemeexport.data.ThemeColorPack
 import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
 import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
@@ -50,7 +52,9 @@ fun ExportScreen(
     themeColorPack: ThemeColorPack
 ) {
     var themeColorPackOutput by remember { mutableStateOf("") }
-    var colorFormat: ColorFormat by remember { mutableStateOf(ColorFormat.SRGBInteger) }
+    var colorFormat: ColorFormat by rememberSaveable(stateSaver = ColorFormatSaver) {
+        mutableStateOf(ColorFormat.SRGBInteger)
+    }
     LaunchedEffect(themeColorPack, colorFormat) {
         themeColorPackOutput = themeColorPack.toComposeThemeFile(colorFormat)
     }
@@ -113,7 +117,10 @@ fun ExportScreen(
             SelectionContainer {
                 Text(
                     text = themeColorPackOutput,
-                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily(Typeface.MONOSPACE)),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        fontFamily = FontFamily(Typeface.MONOSPACE)
+                    ),
                     modifier = Modifier.padding(8.dp)
                 )
             }

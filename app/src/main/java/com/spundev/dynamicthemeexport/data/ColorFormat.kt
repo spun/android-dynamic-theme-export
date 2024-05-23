@@ -1,5 +1,7 @@
 package com.spundev.dynamicthemeexport.data
 
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.blue
@@ -50,4 +52,41 @@ sealed class ColorFormat(val formatter: (Color) -> String) {
         val color = it.toArgb()
         "Color(red = ${color.red}, green = ${color.green}, blue = ${color.blue})"
     })
+}
+
+/**
+ * A custom [Saver] for the [ColorFormat] sealed class that allows saving and restoring a
+ * [ColorFormat] across configuration changes.
+ *
+ * This saver converts the [ColorFormat] instance into a [String] representation when saving
+ * and reconstructs the [ColorFormat] instance from the [String] when restoring.
+ *
+ * Usage:
+ * ```
+ * var colorFormat: ColorFormat by rememberSaveable(stateSaver = ColorFormatSaver) {
+ *     mutableStateOf(ColorFormat.SRGBInteger)
+ * }
+ * ```
+ *
+ * @throws IllegalArgumentException if the [String] does not correspond to any known [ColorFormat].
+ */
+val ColorFormatSaver = object : Saver<ColorFormat, String> {
+    override fun SaverScope.save(value: ColorFormat): String {
+        return when (value) {
+            ColorFormat.FloatComponents -> "FloatComponents"
+            ColorFormat.IntegerComponents -> "IntegerComponents"
+            ColorFormat.IntegerComponentsHex -> "IntegerComponentsHex"
+            ColorFormat.SRGBInteger -> "SRGBInteger"
+        }
+    }
+
+    override fun restore(value: String): ColorFormat {
+        return when (value) {
+            "FloatComponents" -> ColorFormat.FloatComponents
+            "IntegerComponents" -> ColorFormat.IntegerComponents
+            "IntegerComponentsHex" -> ColorFormat.IntegerComponentsHex
+            "SRGBInteger" -> ColorFormat.SRGBInteger
+            else -> throw IllegalArgumentException("Unknown ColorFormat type")
+        }
+    }
 }
