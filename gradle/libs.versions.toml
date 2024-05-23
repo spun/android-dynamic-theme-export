@@ -1,10 +1,9 @@
 [versions]
-androidGradlePlugin = "8.4.0"
+androidGradlePlugin = "8.4.1"
 androidxActivity = "1.9.0"
-androidxComposeBom = "2024.04.01"
-androidxComposeCompiler = "1.5.12"
+androidxComposeBom = "2024.05.00"
 androidxTestExt = "1.1.5"
-kotlin = "1.9.23"
+kotlin = "2.0.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
@@ -18,4 +17,5 @@ androidx-test-ext = { group = "androidx.test.ext", name = "junit-ktx", version.r
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
