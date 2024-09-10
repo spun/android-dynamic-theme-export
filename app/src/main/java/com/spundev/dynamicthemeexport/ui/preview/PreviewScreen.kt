@@ -1,21 +1,22 @@
 package com.spundev.dynamicthemeexport.ui.preview
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
+import android.os.Build
+import android.widget.Toast
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
@@ -23,18 +24,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastAny
 import com.spundev.dynamicthemeexport.data.ElevatedSurfaceLevels
 import com.spundev.dynamicthemeexport.data.ThemeColorPack
 import com.spundev.dynamicthemeexport.ext.getElevatedSurfaceLevels
+import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockBasic
+import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockPair
+import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockWithFixedAccent
+import com.spundev.dynamicthemeexport.ui.preview.components.DefaultColorBlockStyle
+import com.spundev.dynamicthemeexport.ui.preview.components.ForceSmallColorBlockStyle
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
-import com.spundev.dynamicthemeexport.util.freeScroll.freeScrollWithTransformGesture
+import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
 import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
 
 // From ColorSchemeFixedAccentColorSample
@@ -91,61 +100,102 @@ fun ColorRolesTable(
         verticalArrangement = Arrangement.spacedBy(ColorTableSectionPadding),
         modifier = Modifier
             .fillMaxSize()
-            .freeScrollWithTransformGesture(
-                state = rememberFreeScrollState(),
-                onGesture = { _, _, gestureZoom, _ ->
-                    zoom = (zoom * gestureZoom).coerceIn(0.5f, 1f)
-                })
+            .freeScroll(rememberFreeScrollState())
+            // Use a special pointerInput instead of freeScrollWithTransformGesture
+            .pointerInput(Unit) {
+                // NOTE: We need to do this instead of detectGestures because detectGestures has a
+                // few check that break the while loop and that are triggered by the
+                // combinedClickable in our color blocks (copy-to-clipboard feature).
+                // This is a extremely simplify version that only calculates zoom changes.
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false)
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val isConsumed = event.changes.fastAny { it.isConsumed }
+                        if (event.changes.size > 1 && !isConsumed) {
+                            val zoomChange = event.calculateZoom()
+                            zoom = (zoom * zoomChange).coerceIn(0.5f, 1f)
+                            event.changes.forEach { it.consume() }
+                        }
+                    }
+                }
+            }
             .graphicsLayer {
                 scaleX = zoom
                 scaleY = zoom
             }
             .padding(16.dp)
     ) {
+        // Copy to clipboard
+        val context = LocalContext.current
+        val clipboardManager = LocalClipboardManager.current
+        val onCopy: (String) -> Unit = {
+            clipboardManager.setText(AnnotatedString(it))
+            // Only show a toast for Android 12 (32) and lower.
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                Toast.makeText(context, "Text copied", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         Row(horizontalArrangement = Arrangement.spacedBy(ColorTableSectionPadding)) {
             Row(horizontalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
                 Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-                    ColorBlockSimple(
+                    ColorBlockPair(
                         text = "Primary",
                         color = MaterialTheme.colorScheme.primary,
+                        onCopy = onCopy,
+                        modifier = Modifier.width(ColorCellWidth)
                     )
-                    ColorBlockSimple(
+                    ColorBlockPair(
                         text = "Primary Container",
                         color = MaterialTheme.colorScheme.primaryContainer,
+                        onCopy = onCopy,
+                        modifier = Modifier.width(ColorCellWidth)
                     )
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-                    ColorBlockSimple(
+                    ColorBlockPair(
                         text = "Secondary",
                         color = MaterialTheme.colorScheme.secondary,
+                        onCopy = onCopy,
+                        modifier = Modifier.width(ColorCellWidth)
                     )
-                    ColorBlockSimple(
+                    ColorBlockPair(
                         text = "Secondary Container",
                         color = MaterialTheme.colorScheme.secondaryContainer,
+                        onCopy = onCopy,
+                        modifier = Modifier.width(ColorCellWidth)
                     )
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-                    ColorBlockSimple(
+                    ColorBlockPair(
                         text = "Tertiary",
                         color = MaterialTheme.colorScheme.tertiary,
+                        onCopy = onCopy,
+                        modifier = Modifier.width(ColorCellWidth)
                     )
-                    ColorBlockSimple(
+                    ColorBlockPair(
                         text = "Tertiary Container",
                         color = MaterialTheme.colorScheme.tertiaryContainer,
+                        onCopy = onCopy,
+                        modifier = Modifier.width(ColorCellWidth)
                     )
                 }
             }
             Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-                ColorBlockSimple(
+                ColorBlockPair(
                     text = "Error",
                     color = MaterialTheme.colorScheme.error,
+                    onCopy = onCopy,
+                    modifier = Modifier.width(ColorCellWidth)
                 )
-                ColorBlockSimple(
+                ColorBlockPair(
                     text = "Error Container",
                     color = MaterialTheme.colorScheme.errorContainer,
+                    onCopy = onCopy,
+                    modifier = Modifier.width(ColorCellWidth)
                 )
             }
         }
@@ -160,6 +210,8 @@ fun ColorRolesTable(
                 onFixedColor = fixedAccentColors.onPrimaryFixed,
                 onFixedVariantText = "On Primary Fixed Variant",
                 onFixedVariantColor = fixedAccentColors.onPrimaryFixedVariant,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
             )
 
             ColorBlockWithFixedAccent(
@@ -171,6 +223,8 @@ fun ColorRolesTable(
                 onFixedColor = fixedAccentColors.onSecondaryFixed,
                 onFixedVariantText = "On Secondary Fixed Variant",
                 onFixedVariantColor = fixedAccentColors.onSecondaryFixedVariant,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
             )
 
             ColorBlockWithFixedAccent(
@@ -182,336 +236,166 @@ fun ColorRolesTable(
                 onFixedColor = fixedAccentColors.onTertiaryFixed,
                 onFixedVariantText = "On Tertiary Fixed Variant",
                 onFixedVariantColor = fixedAccentColors.onTertiaryFixedVariant,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
             )
         }
 
-        SurfaceSection()
+        SurfaceSection(onCopy = onCopy)
 
-        DeprecatedSection()
+        DeprecatedSection(onCopy = onCopy)
 
-        ElevatedSurfaceLevelsSection(elevatedSurfaceLevels)
+        ElevatedSurfaceLevelsSection(
+            colors = elevatedSurfaceLevels,
+            onCopy = onCopy
+        )
     }
 }
 
+
 @Composable
-private fun ColorBlockSimple(
-    text: String,
-    color: Color,
+private fun SurfaceSection(
+    onCopy: (String) -> Unit
 ) {
-    val onText = "On $text"
-    val onColor = MaterialTheme.colorScheme.contentColorFor(color)
-
-    Column(modifier = Modifier.width(ColorCellWidth)) {
-        Box(
-            contentAlignment = Alignment.TopStart,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(ColorTableBigCellHeight)
-                .background(color)
-                .padding(ColorCellContentPadding)
-        ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodySmall,
-                color = onColor
-            )
-        }
-        Box(
-            contentAlignment = Alignment.CenterStart,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(ColorTableSmallCellHeight)
-                .background(onColor)
-                .padding(ColorCellContentPadding)
-        ) {
-            Text(
-                text = onText,
-                style = MaterialTheme.typography.bodySmall,
-                color = color
-            )
-        }
-    }
-}
-
-/**
- * Block for Fixed accent colors
- */
-@Composable
-private fun ColorBlockWithFixedAccent(
-    fixedText: String,
-    fixedColor: Color,
-    fixedDimText: String,
-    fixedDimColor: Color,
-    onFixedText: String,
-    onFixedColor: Color,
-    onFixedVariantText: String,
-    onFixedVariantColor: Color
-) {
-    Column(
-        modifier = Modifier
-            .width(ColorCellWidth)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(ColorTableBigCellHeight)
-        ) {
-            Box(
-                contentAlignment = Alignment.TopStart,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(fixedColor)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = fixedText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = onFixedColor
-                )
-            }
-
-            Box(
-                contentAlignment = Alignment.TopStart,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(fixedDimColor)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = fixedDimText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = onFixedColor
-                )
-            }
-        }
-
-        Box(
-            contentAlignment = Alignment.CenterStart,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(ColorTableSmallCellHeight)
-                .background(onFixedColor)
-                .padding(ColorCellContentPadding)
-        ) {
-            Text(
-                text = onFixedText,
-                style = MaterialTheme.typography.bodySmall,
-                color = fixedColor
-            )
-        }
-        Box(
-            contentAlignment = Alignment.CenterStart,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(ColorTableSmallCellHeight)
-                .background(onFixedVariantColor)
-                .padding(ColorCellContentPadding)
-        ) {
-            Text(
-                text = onFixedVariantText,
-                style = MaterialTheme.typography.bodySmall,
-                color = fixedColor
-            )
-        }
-    }
-}
-
-@Composable
-private fun SurfaceSection() {
 
     // The surface section has the width of 3 cell blocks without any padding in between
     val surfaceSectionWidth = ((ColorCellWidth * 3) + (ColorTableCellPadding * 2))
 
     Row(horizontalArrangement = Arrangement.spacedBy(ColorTableSectionPadding)) {
         Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-            Row(
-                modifier = Modifier
-                    .width(surfaceSectionWidth)
-                    .height(ColorTableBigCellHeight)
-            ) {
-                Box(
+            Row(modifier = Modifier.width(surfaceSectionWidth)) {
+                ColorBlockBasic(
+                    text = "Surface Dim",
+                    color = MaterialTheme.colorScheme.surfaceDim,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
-                        .background(MaterialTheme.colorScheme.surfaceDim)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Surface Dim",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Surface",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .background(MaterialTheme.colorScheme.surfaceBright)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Surface Bright",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .width(surfaceSectionWidth)
-                    .height(ColorTableBigCellHeight)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Surface Container Lowest",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Surface Container Low",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Surface Container",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                )
 
-                Box(
+                ColorBlockBasic(
+                    text = "Surface",
+                    color = MaterialTheme.colorScheme.surface,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Surface Container High",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                )
 
-                Box(
+                ColorBlockBasic(
+                    text = "Surface Bright",
+                    color = MaterialTheme.colorScheme.surfaceBright,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Surface Container Highest",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                )
             }
-            Row(
-                modifier = Modifier
-                    .width(surfaceSectionWidth)
-                    .height(ColorTableSmallCellHeight)
-            ) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
+            Row(modifier = Modifier.width(surfaceSectionWidth)) {
+                ColorBlockBasic(
+                    text = "Surface Container Lowest",
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
-                        .background(MaterialTheme.colorScheme.onSurface)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "On Surface",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-                Box(
-                    contentAlignment = Alignment.CenterStart,
+                )
+
+                ColorBlockBasic(
+                    text = "Surface Container Low",
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
-                        .background(MaterialTheme.colorScheme.onSurfaceVariant)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "On Surface Variant",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-                Box(
-                    contentAlignment = Alignment.CenterStart,
+                )
+
+                ColorBlockBasic(
+                    text = "Surface Container",
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
-                        .background(MaterialTheme.colorScheme.outline)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Outline",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-                Box(
-                    contentAlignment = Alignment.CenterStart,
+                )
+
+                ColorBlockBasic(
+                    text = "Surface Container High",
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
-                        .background(MaterialTheme.colorScheme.outlineVariant)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Outline Variant",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                )
+
+                ColorBlockBasic(
+                    text = "Surface Container Highest",
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                )
+            }
+            Row(modifier = Modifier.width(surfaceSectionWidth)) {
+                ColorBlockBasic(
+                    text = "On Surface",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    onColor = MaterialTheme.colorScheme.surface,
+                    onCopy = onCopy,
+                    style = ForceSmallColorBlockStyle,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                )
+
+                ColorBlockBasic(
+                    text = "On Surface Variant",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    onColor = MaterialTheme.colorScheme.surface,
+                    onCopy = onCopy,
+                    style = ForceSmallColorBlockStyle,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                )
+
+                ColorBlockBasic(
+                    text = "Outline",
+                    color = MaterialTheme.colorScheme.outline,
+                    onColor = MaterialTheme.colorScheme.surface,
+                    onCopy = onCopy,
+                    style = ForceSmallColorBlockStyle,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                )
+
+                ColorBlockBasic(
+                    text = "Outline Variant",
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
+                    style = ForceSmallColorBlockStyle,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                )
             }
         }
 
         // The last column with the inverse colors has the same size as the surface section with two
         // rows of big cells and a row of small cells with padding in between
         val inverseColumnHeight =
-            (ColorTableBigCellHeight * 2) + ColorTableSmallCellHeight + (ColorTableCellPadding * 2)
+            (DefaultColorBlockStyle.bigCellHeight * 2) + DefaultColorBlockStyle.smallCellHeight + (ColorTableCellPadding * 2)
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.height(inverseColumnHeight)
@@ -519,83 +403,55 @@ private fun SurfaceSection() {
             Column(
                 verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)
             ) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .height(ColorTableSmallCellHeight)
-                        .width(ColorCellWidth)
-                        .background(MaterialTheme.colorScheme.inverseSurface)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Inverse Surface",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .height(ColorTableSmallCellHeight)
-                        .width(ColorCellWidth)
-                        .background(MaterialTheme.colorScheme.inverseOnSurface)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Inverse On Surface",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .height(ColorTableSmallCellHeight)
-                        .width(ColorCellWidth)
-                        .background(MaterialTheme.colorScheme.inversePrimary)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Inverse Primary",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+                ColorBlockBasic(
+                    text = "Inverse Surface",
+                    color = MaterialTheme.colorScheme.inverseSurface,
+                    onColor = MaterialTheme.colorScheme.surface,
+                    onCopy = onCopy,
+                    style = ForceSmallColorBlockStyle,
+                    modifier = Modifier.width(ColorCellWidth)
+                )
+
+
+                ColorBlockBasic(
+                    text = "Inverse On Surface",
+                    color = MaterialTheme.colorScheme.inverseOnSurface,
+                    onColor = MaterialTheme.colorScheme.onSurface,
+                    onCopy = onCopy,
+                    style = ForceSmallColorBlockStyle,
+                    modifier = Modifier.width(ColorCellWidth)
+                )
+
+                ColorBlockBasic(
+                    text = "Inverse Primary",
+                    color = MaterialTheme.colorScheme.inversePrimary,
+                    onColor = MaterialTheme.colorScheme.primary,
+                    onCopy = onCopy,
+                    style = ForceSmallColorBlockStyle,
+                    modifier = Modifier.width(ColorCellWidth)
+                )
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(ColorTableSectionPadding),
-                modifier = Modifier
-                    .width(ColorCellWidth)
-                    .height(ColorTableSmallCellHeight)
+                modifier = Modifier.width(ColorCellWidth)
             ) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .background(MaterialTheme.colorScheme.scrim)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Scrim",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White
-                    )
-                }
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .background(Color.Black)
-                        .padding(ColorCellContentPadding)
-                ) {
-                    Text(
-                        text = "Shadow?",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White
-                    )
-                }
+                ColorBlockBasic(
+                    text = "Scrim",
+                    color = MaterialTheme.colorScheme.scrim,
+                    onColor = Color.White,
+                    onCopy = onCopy,
+                    style = ForceSmallColorBlockStyle,
+                    modifier = Modifier.weight(1f)
+                )
+
+                ColorBlockBasic(
+                    text = "Shadow?",
+                    color = Color.Black,
+                    onColor = Color.White,
+                    onCopy = onCopy,
+                    style = ForceSmallColorBlockStyle,
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
@@ -606,7 +462,9 @@ private fun SurfaceSection() {
  * "Color Roles" table
  */
 @Composable
-private fun DeprecatedSection() {
+private fun DeprecatedSection(
+    onCopy: (String) -> Unit
+) {
     Column {
         Text(
             text = "> DEPRECATED",
@@ -616,38 +474,28 @@ private fun DeprecatedSection() {
         Spacer(modifier = Modifier.height(ColorTableSectionPadding))
 
         Row(horizontalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-            ColorBlockSimple(
+            ColorBlockPair(
                 text = "Background",
                 color = MaterialTheme.colorScheme.background,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
             )
 
-            Box(
-                modifier = Modifier
-                    .height(ColorTableBigCellHeight)
-                    .width(ColorCellWidth)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = "Surface variant",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            ColorBlockBasic(
+                text = "Surface variant",
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                onColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
+            )
 
-            Box(
-                modifier = Modifier
-                    .height(ColorTableBigCellHeight)
-                    .width(ColorCellWidth)
-                    .background(MaterialTheme.colorScheme.surfaceTint)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = "Surface tint",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.surface
-                )
-            }
+            ColorBlockBasic(
+                text = "Surface tint",
+                color = MaterialTheme.colorScheme.surfaceTint,
+                onColor = MaterialTheme.colorScheme.surface,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
+            )
         }
     }
 }
@@ -656,7 +504,10 @@ private fun DeprecatedSection() {
  * Legacy elevated surface colors
  */
 @Composable
-private fun ElevatedSurfaceLevelsSection(colors: ElevatedSurfaceLevels) {
+private fun ElevatedSurfaceLevelsSection(
+    colors: ElevatedSurfaceLevels,
+    onCopy: (String) -> Unit
+) {
     Column {
         Text(
             text = "> LEGACY ELEVATED SURFACES",
@@ -668,78 +519,56 @@ private fun ElevatedSurfaceLevelsSection(colors: ElevatedSurfaceLevels) {
         // The surface section has the width of 3 cell blocks without any padding in between
         val surfaceSectionWidth = ((ColorCellWidth * 3) + (ColorTableCellPadding * 2))
 
-        Row(
-            modifier = Modifier
-                .width(surfaceSectionWidth)
-                .height(ColorTableBigCellHeight)
-        ) {
-            Box(
+        Row(modifier = Modifier.width(surfaceSectionWidth)) {
+            ColorBlockBasic(
+                text = "Surface at +1",
+                color = colors.surfaceLevel1,
+                onColor = MaterialTheme.colorScheme.onSurface,
+                onCopy = onCopy,
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
-                    .background(colors.surfaceLevel1)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = "Surface at +1",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(colors.surfaceLevel2)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = "Surface at +2",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(colors.surfaceLevel3)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = "Surface at +3",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            )
 
-            Box(
+            ColorBlockBasic(
+                text = "Surface at +2",
+                color = colors.surfaceLevel2,
+                onColor = MaterialTheme.colorScheme.onSurface,
+                onCopy = onCopy,
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
-                    .background(colors.surfaceLevel4)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = "Surface at +4",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            )
 
-            Box(
+            ColorBlockBasic(
+                text = "Surface at +3",
+                color = colors.surfaceLevel3,
+                onColor = MaterialTheme.colorScheme.onSurface,
+                onCopy = onCopy,
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
-                    .background(colors.surfaceLevel5)
-                    .padding(ColorCellContentPadding)
-            ) {
-                Text(
-                    text = "Surface at +5",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            )
+
+            ColorBlockBasic(
+                text = "Surface at +4",
+                color = colors.surfaceLevel4,
+                onColor = MaterialTheme.colorScheme.onSurface,
+                onCopy = onCopy,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            )
+
+            ColorBlockBasic(
+                text = "Surface at +5",
+                color = colors.surfaceLevel5,
+                onColor = MaterialTheme.colorScheme.onSurface,
+                onCopy = onCopy,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            )
         }
     }
 }
@@ -753,15 +582,16 @@ private val ColorTableSectionPadding = 16.dp
 // Width of a table cell
 private val ColorCellWidth = 180.dp
 
-// Padding for the content of the cell
-private val ColorCellContentPadding = 8.dp
-
-// Height of the different color blocks
-private val ColorTableSmallCellHeight = 32.dp
-private val ColorTableBigCellHeight = 64.dp
-
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true,
+    device = "spec:width=2130px,height=2230px,dpi=440,orientation=portrait"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    showBackground = true,
+    device = "spec:width=2130px,height=2230px,dpi=440,orientation=portrait"
+)
 @Composable
 private fun ColorRolesTablePreview() {
     val context = LocalContext.current
