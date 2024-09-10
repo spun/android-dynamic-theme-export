@@ -30,6 +30,5 @@ Use the **Export** tab to copy all the dynamic theme values as [Material3 Compos
 
 ## TODO
 
-- [ ] Copy color values from Preview table
 - [ ] Fix Preview zoom
 - [ ] Export as xml file? (views)
