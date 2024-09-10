@@ -1,7 +1,6 @@
 package com.spundev.dynamicthemeexport.data
 
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.blue
@@ -70,18 +69,17 @@ sealed class ColorFormat(val formatter: (Color) -> String) {
  *
  * @throws IllegalArgumentException if the [String] does not correspond to any known [ColorFormat].
  */
-val ColorFormatSaver = object : Saver<ColorFormat, String> {
-    override fun SaverScope.save(value: ColorFormat): String {
-        return when (value) {
+val ColorFormatSaver = Saver<ColorFormat, String>(
+    save = {
+        when (it) {
             ColorFormat.FloatComponents -> "FloatComponents"
             ColorFormat.IntegerComponents -> "IntegerComponents"
             ColorFormat.IntegerComponentsHex -> "IntegerComponentsHex"
             ColorFormat.SRGBInteger -> "SRGBInteger"
         }
-    }
-
-    override fun restore(value: String): ColorFormat {
-        return when (value) {
+    },
+    restore = {
+        when (it) {
             "FloatComponents" -> ColorFormat.FloatComponents
             "IntegerComponents" -> ColorFormat.IntegerComponents
             "IntegerComponentsHex" -> ColorFormat.IntegerComponentsHex
@@ -89,4 +87,4 @@ val ColorFormatSaver = object : Saver<ColorFormat, String> {
             else -> throw IllegalArgumentException("Unknown ColorFormat type")
         }
     }
-}
+)
