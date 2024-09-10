@@ -67,14 +67,16 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        run: ./gradlew :app:assembleRelease
+        run: ./gradlew :app:assembleRelease :app:bundleRelease
 
       - name: Upload Release Build to Artifacts 📦
         uses: actions/upload-artifact@v4
         with:
           name: release-artifacts
           if-no-files-found: error
-          path: app/build/outputs/apk/release/app-release.apk
+          path: |
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/bundle/release/app-release.aab
 
   deploy:
     name: Create new release
@@ -96,4 +98,6 @@ jobs:
           generate_release_notes: true
           draft: true
           fail_on_unmatched_files: true
-          files: app-release.apk
+          files: |
+            app-release.apk
+            app-release.aab
