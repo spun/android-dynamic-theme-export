@@ -1,7 +1,7 @@
 [versions]
-androidGradlePlugin = "8.7.3"
-androidxActivity = "1.9.3"
-androidxComposeBom = "2024.12.01"
+androidGradlePlugin = "8.8.0"
+androidxActivity = "1.10.0"
+androidxComposeBom = "2025.01.01"
 androidxTestExt = "1.2.1"
 kotlin = "2.1.10"
 
