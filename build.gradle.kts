@@ -7,6 +7,7 @@ plugins {
 }
 
 val ktlintFormatting = libs.detekt.ktlint.formatting
+val twitterComposeRules = libs.detekt.compose.rules
 subprojects {
     apply {
         plugin("io.gitlab.arturbosch.detekt")
@@ -23,5 +24,6 @@ subprojects {
         // We don't know why but without the module the config file will only have the default
         // detekt rules.
         detektPlugins(ktlintFormatting)
+        detektPlugins(twitterComposeRules)
     }
 }
