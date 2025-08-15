@@ -43,6 +43,9 @@ jobs:
       - name: Lint Check 🧹
         run: ./gradlew lint
 
+      - name: Run Detekt 🔍
+        run: ./gradlew detekt
+
       - name: Run local tests 🧪
         run: ./gradlew test
 
