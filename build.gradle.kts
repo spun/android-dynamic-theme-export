@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
+val ktlintFormatting = libs.detekt.ktlint.formatting
 subprojects {
     apply {
         plugin("io.gitlab.arturbosch.detekt")
@@ -13,5 +14,14 @@ subprojects {
 
     detekt {
         config.from(rootProject.files("config/detekt/detekt.yml"))
+    }
+
+    dependencies {
+        // To generate the config file including these plugins, we need to run the command using a
+        // module name like this:
+        //      ./gradlew :app:detektGenerateConfig
+        // We don't know why but without the module the config file will only have the default
+        // detekt rules.
+        detektPlugins(ktlintFormatting)
     }
 }
