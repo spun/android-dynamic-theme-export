@@ -41,7 +41,7 @@ sealed class ColorFormat(val formatter: (Color) -> String) {
             "red = 0x${color.red.toHexString(customHexFormat).padStart(2, '0')}, " +
             "green = 0x${color.green.toHexString(customHexFormat).padStart(2, '0')}, " +
             "blue = 0x${color.blue.toHexString(customHexFormat).padStart(2, '0')}" +
-        ")"
+            ")"
     })
 
     /**

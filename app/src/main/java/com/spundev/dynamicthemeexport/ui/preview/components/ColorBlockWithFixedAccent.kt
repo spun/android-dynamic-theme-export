@@ -38,19 +38,20 @@ fun ColorBlockWithFixedAccent(
     modifier: Modifier = Modifier,
     style: ColorBlockStyle = DefaultColorBlockStyle
 ) {
-    Column(modifier = modifier
-        .combinedClickable(
-            onClick = { },
-            onLongClick = {
-                val formatter = ColorBlockCopyFormatter
-                buildString {
-                    appendLine("$fixedText: ${formatter(fixedColor)}")
-                    appendLine("$fixedDimText: ${formatter(fixedDimColor)}")
-                    appendLine("$onFixedText: ${formatter(onFixedColor)}")
-                    appendLine("$onFixedVariantText: ${formatter(onFixedVariantColor)}")
-                }.let(onCopy)
-            }
-        )
+    Column(
+        modifier = modifier
+            .combinedClickable(
+                onClick = { },
+                onLongClick = {
+                    val formatter = ColorBlockCopyFormatter
+                    buildString {
+                        appendLine("$fixedText: ${formatter(fixedColor)}")
+                        appendLine("$fixedDimText: ${formatter(fixedDimColor)}")
+                        appendLine("$onFixedText: ${formatter(onFixedColor)}")
+                        appendLine("$onFixedVariantText: ${formatter(onFixedVariantColor)}")
+                    }.let(onCopy)
+                }
+            )
     ) {
         Row(
             modifier = Modifier
@@ -97,7 +98,9 @@ fun ColorBlockWithFixedAccent(
                 .padding(style.contentPadding)
         ) {
             Text(
-                text = onFixedText, style = MaterialTheme.typography.bodySmall, color = fixedColor
+                text = onFixedText,
+                style = MaterialTheme.typography.bodySmall,
+                color = fixedColor
             )
         }
         Box(

@@ -3,6 +3,8 @@ androidGradlePlugin = "8.12.0"
 androidxActivity = "1.10.1"
 androidxComposeBom = "2025.07.00"
 androidxTestExt = "1.3.0"
+detekt = "1.23.8"
+detektComposeRules = "0.0.26"
 kotlin = "2.2.0"
 
 [libraries]
@@ -13,9 +15,11 @@ androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test-juni
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-test-ext = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "androidxTestExt" }
+detekt-compose-rules = { group = "com.twitter.compose.rules", name = "detekt", version.ref = "detektComposeRules" }
+detekt-ktlint-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

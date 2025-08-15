@@ -35,13 +35,13 @@ import com.spundev.dynamicthemeexport.ui.preview.ColorRolesTable
 
 @Composable
 fun MainScreen(
-    isDarkTheme: Boolean = isSystemInDarkTheme(),
     themeColorPack: ThemeColorPack,
     onDarkThemeChange: (isDarkTheme: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    isDarkTheme: Boolean = isSystemInDarkTheme(),
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.systemBarsPadding()) {
-
             var currentScreenIndex by rememberSaveable { mutableIntStateOf(0) }
             MainTopBar(
                 isDarkTheme = isDarkTheme,

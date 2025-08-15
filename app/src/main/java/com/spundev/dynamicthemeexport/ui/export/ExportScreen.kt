@@ -49,7 +49,8 @@ import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
 
 @Composable
 fun ExportScreen(
-    themeColorPack: ThemeColorPack
+    themeColorPack: ThemeColorPack,
+    modifier: Modifier = Modifier
 ) {
     var themeColorPackOutput by remember { mutableStateOf("") }
     var colorFormat: ColorFormat by rememberSaveable(stateSaver = ColorFormatSaver) {
@@ -64,7 +65,7 @@ fun ExportScreen(
     val clipboardManager = LocalClipboardManager.current
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {
@@ -78,22 +79,16 @@ fun ExportScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             // Copy
-            FilledTonalIconButton(
-                onClick = {
-                    clipboardManager.setText(AnnotatedString(themeColorPackOutput))
-                    // Only show a toast for Android 12 (32) and lower.
-                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                        Toast.makeText(context, "Text copied", Toast.LENGTH_SHORT).show()
-                    }
+            CopyButton(onClick = {
+                clipboardManager.setText(AnnotatedString(themeColorPackOutput))
+                // Only show a toast for Android 12 (32) and lower.
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                    Toast.makeText(context, "Text copied", Toast.LENGTH_SHORT).show()
                 }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_content_copy_24),
-                    contentDescription = "Copy to clipboard"
-                )
-            }
+            })
+
             // Share
-            FilledTonalIconButton(onClick = {
+            ShareButton(onClick = {
                 val sendIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(Intent.EXTRA_TEXT, themeColorPackOutput)
@@ -101,9 +96,7 @@ fun ExportScreen(
                 }
                 val shareIntent = Intent.createChooser(sendIntent, null)
                 context.startActivity(shareIntent)
-            }) {
-                Icon(imageVector = Icons.Default.Share, contentDescription = "Share")
-            }
+            })
         }
 
         // Text preview
@@ -172,5 +165,29 @@ private fun ColorFormatSelection(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun CopyButton(
+    onClick: () -> Unit
+) {
+    FilledTonalIconButton(onClick = onClick) {
+        Icon(
+            painter = painterResource(R.drawable.ic_content_copy_24),
+            contentDescription = "Copy to clipboard"
+        )
+    }
+}
+
+@Composable
+private fun ShareButton(
+    onClick: () -> Unit
+) {
+    FilledTonalIconButton(onClick = onClick) {
+        Icon(
+            imageVector = Icons.Default.Share,
+            contentDescription = "Share"
+        )
     }
 }

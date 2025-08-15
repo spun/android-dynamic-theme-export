@@ -31,17 +31,20 @@ jobs:
       - name: Validate Gradle Wrapper 📜
         uses: gradle/actions/wrapper-validation@v4
 
-      - name: Set up JDK 17 ☕
+      - name: Set up JDK 21 ☕
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: 17
+          java-version: 21
 
       - name: Setup Gradle 🧰
         uses: gradle/actions/setup-gradle@v4
 
       - name: Lint Check 🧹
         run: ./gradlew lint
+
+      - name: Run Detekt 🔍
+        run: ./gradlew detektDebug
 
       - name: Run local tests 🧪
         run: ./gradlew test

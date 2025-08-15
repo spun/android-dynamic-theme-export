@@ -66,29 +66,9 @@ private data class FixedAccentColors(
 
 @Composable
 fun ColorRolesTable(
-    themeColorPack: ThemeColorPack
+    themeColorPack: ThemeColorPack,
+    modifier: Modifier = Modifier
 ) {
-    // From ColorSchemeFixedAccentColorSample
-    // Source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/samples/src/main/java/androidx/compose/material3/samples/ColorSchemeSamples.kt;l=32;bpv=0;bpt=0
-    val fixedAccentColors = remember(themeColorPack) {
-        val light = themeColorPack.lightColorScheme
-        val dark = themeColorPack.darkColorScheme
-        FixedAccentColors(
-            primaryFixed = light.primaryContainer,
-            onPrimaryFixed = light.onPrimaryContainer,
-            secondaryFixed = light.secondaryContainer,
-            onSecondaryFixed = light.onSecondaryContainer,
-            tertiaryFixed = light.tertiaryContainer,
-            onTertiaryFixed = light.onTertiaryContainer,
-            primaryFixedDim = dark.primary,
-            secondaryFixedDim = dark.secondary,
-            tertiaryFixedDim = dark.tertiary,
-            onPrimaryFixedVariant = light.primary,
-            onSecondaryFixedVariant = light.secondary,
-            onTertiaryFixedVariant = light.tertiary,
-        )
-    }
-
     // Legacy elevated surface colors
     val currentColorScheme = MaterialTheme.colorScheme
     val elevatedSurfaceLevels = remember(currentColorScheme) {
@@ -98,7 +78,7 @@ fun ColorRolesTable(
     var zoom: Float by remember { mutableFloatStateOf(1f) }
     Column(
         verticalArrangement = Arrangement.spacedBy(ColorTableSectionPadding),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .freeScroll(rememberFreeScrollState())
             // Use a special pointerInput instead of freeScrollWithTransformGesture
@@ -138,108 +118,11 @@ fun ColorRolesTable(
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(ColorTableSectionPadding)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-                Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-                    ColorBlockPair(
-                        text = "Primary",
-                        color = MaterialTheme.colorScheme.primary,
-                        onCopy = onCopy,
-                        modifier = Modifier.width(ColorCellWidth)
-                    )
-                    ColorBlockPair(
-                        text = "Primary Container",
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        onCopy = onCopy,
-                        modifier = Modifier.width(ColorCellWidth)
-                    )
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-                    ColorBlockPair(
-                        text = "Secondary",
-                        color = MaterialTheme.colorScheme.secondary,
-                        onCopy = onCopy,
-                        modifier = Modifier.width(ColorCellWidth)
-                    )
-                    ColorBlockPair(
-                        text = "Secondary Container",
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        onCopy = onCopy,
-                        modifier = Modifier.width(ColorCellWidth)
-                    )
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-                    ColorBlockPair(
-                        text = "Tertiary",
-                        color = MaterialTheme.colorScheme.tertiary,
-                        onCopy = onCopy,
-                        modifier = Modifier.width(ColorCellWidth)
-                    )
-                    ColorBlockPair(
-                        text = "Tertiary Container",
-                        color = MaterialTheme.colorScheme.tertiaryContainer,
-                        onCopy = onCopy,
-                        modifier = Modifier.width(ColorCellWidth)
-                    )
-                }
-            }
-            Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-                ColorBlockPair(
-                    text = "Error",
-                    color = MaterialTheme.colorScheme.error,
-                    onCopy = onCopy,
-                    modifier = Modifier.width(ColorCellWidth)
-                )
-                ColorBlockPair(
-                    text = "Error Container",
-                    color = MaterialTheme.colorScheme.errorContainer,
-                    onCopy = onCopy,
-                    modifier = Modifier.width(ColorCellWidth)
-                )
-            }
+            BaseColorsWithContainersSection(onCopy = onCopy)
+            ErrorColorWithContainer(onCopy)
         }
 
-        Row(horizontalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
-            ColorBlockWithFixedAccent(
-                fixedText = "Primary Fixed",
-                fixedColor = fixedAccentColors.primaryFixed,
-                fixedDimText = "Primary Fixed Dim",
-                fixedDimColor = fixedAccentColors.primaryFixedDim,
-                onFixedText = "On Primary Fixed",
-                onFixedColor = fixedAccentColors.onPrimaryFixed,
-                onFixedVariantText = "On Primary Fixed Variant",
-                onFixedVariantColor = fixedAccentColors.onPrimaryFixedVariant,
-                onCopy = onCopy,
-                modifier = Modifier.width(ColorCellWidth)
-            )
-
-            ColorBlockWithFixedAccent(
-                fixedText = "Secondary Fixed",
-                fixedColor = fixedAccentColors.secondaryFixed,
-                fixedDimText = "Secondary Fixed Dim",
-                fixedDimColor = fixedAccentColors.secondaryFixedDim,
-                onFixedText = "On Secondary Fixed",
-                onFixedColor = fixedAccentColors.onSecondaryFixed,
-                onFixedVariantText = "On Secondary Fixed Variant",
-                onFixedVariantColor = fixedAccentColors.onSecondaryFixedVariant,
-                onCopy = onCopy,
-                modifier = Modifier.width(ColorCellWidth)
-            )
-
-            ColorBlockWithFixedAccent(
-                fixedText = "Tertiary Fixed",
-                fixedColor = fixedAccentColors.tertiaryFixed,
-                fixedDimText = "Tertiary Fixed Dim",
-                fixedDimColor = fixedAccentColors.tertiaryFixedDim,
-                onFixedText = "On Tertiary Fixed",
-                onFixedColor = fixedAccentColors.onTertiaryFixed,
-                onFixedVariantText = "On Tertiary Fixed Variant",
-                onFixedVariantColor = fixedAccentColors.onTertiaryFixedVariant,
-                onCopy = onCopy,
-                modifier = Modifier.width(ColorCellWidth)
-            )
-        }
+        FixedColorsSection(themeColorPack = themeColorPack, onCopy = onCopy)
 
         SurfaceSection(onCopy = onCopy)
 
@@ -252,12 +135,152 @@ fun ColorRolesTable(
     }
 }
 
+// Primary, Secondary and Tertiary with their container colors.
+@Composable
+private fun BaseColorsWithContainersSection(
+    onCopy: (String) -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
+        Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
+            ColorBlockPair(
+                text = "Primary",
+                color = MaterialTheme.colorScheme.primary,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
+            )
+            ColorBlockPair(
+                text = "Primary Container",
+                color = MaterialTheme.colorScheme.primaryContainer,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
+            )
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
+            ColorBlockPair(
+                text = "Secondary",
+                color = MaterialTheme.colorScheme.secondary,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
+            )
+            ColorBlockPair(
+                text = "Secondary Container",
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
+            )
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
+            ColorBlockPair(
+                text = "Tertiary",
+                color = MaterialTheme.colorScheme.tertiary,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
+            )
+            ColorBlockPair(
+                text = "Tertiary Container",
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                onCopy = onCopy,
+                modifier = Modifier.width(ColorCellWidth)
+            )
+        }
+    }
+}
+
+// Error color with its container color.
+@Composable
+private fun ErrorColorWithContainer(
+    onCopy: (String) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
+        ColorBlockPair(
+            text = "Error",
+            color = MaterialTheme.colorScheme.error,
+            onCopy = onCopy,
+            modifier = Modifier.width(ColorCellWidth)
+        )
+        ColorBlockPair(
+            text = "Error Container",
+            color = MaterialTheme.colorScheme.errorContainer,
+            onCopy = onCopy,
+            modifier = Modifier.width(ColorCellWidth)
+        )
+    }
+}
+
+@Composable
+private fun FixedColorsSection(
+    themeColorPack: ThemeColorPack,
+    onCopy: (String) -> Unit,
+) {
+    // From ColorSchemeFixedAccentColorSample
+    // Source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/samples/src/main/java/androidx/compose/material3/samples/ColorSchemeSamples.kt;l=32;bpv=0;bpt=0
+    val fixedAccentColors = remember(themeColorPack) {
+        val light = themeColorPack.lightColorScheme
+        val dark = themeColorPack.darkColorScheme
+        FixedAccentColors(
+            primaryFixed = light.primaryContainer,
+            onPrimaryFixed = light.onPrimaryContainer,
+            secondaryFixed = light.secondaryContainer,
+            onSecondaryFixed = light.onSecondaryContainer,
+            tertiaryFixed = light.tertiaryContainer,
+            onTertiaryFixed = light.onTertiaryContainer,
+            primaryFixedDim = dark.primary,
+            secondaryFixedDim = dark.secondary,
+            tertiaryFixedDim = dark.tertiary,
+            onPrimaryFixedVariant = light.primary,
+            onSecondaryFixedVariant = light.secondary,
+            onTertiaryFixedVariant = light.tertiary,
+        )
+    }
+
+    Row(horizontalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
+        ColorBlockWithFixedAccent(
+            fixedText = "Primary Fixed",
+            fixedColor = fixedAccentColors.primaryFixed,
+            fixedDimText = "Primary Fixed Dim",
+            fixedDimColor = fixedAccentColors.primaryFixedDim,
+            onFixedText = "On Primary Fixed",
+            onFixedColor = fixedAccentColors.onPrimaryFixed,
+            onFixedVariantText = "On Primary Fixed Variant",
+            onFixedVariantColor = fixedAccentColors.onPrimaryFixedVariant,
+            onCopy = onCopy,
+            modifier = Modifier.width(ColorCellWidth)
+        )
+
+        ColorBlockWithFixedAccent(
+            fixedText = "Secondary Fixed",
+            fixedColor = fixedAccentColors.secondaryFixed,
+            fixedDimText = "Secondary Fixed Dim",
+            fixedDimColor = fixedAccentColors.secondaryFixedDim,
+            onFixedText = "On Secondary Fixed",
+            onFixedColor = fixedAccentColors.onSecondaryFixed,
+            onFixedVariantText = "On Secondary Fixed Variant",
+            onFixedVariantColor = fixedAccentColors.onSecondaryFixedVariant,
+            onCopy = onCopy,
+            modifier = Modifier.width(ColorCellWidth)
+        )
+
+        ColorBlockWithFixedAccent(
+            fixedText = "Tertiary Fixed",
+            fixedColor = fixedAccentColors.tertiaryFixed,
+            fixedDimText = "Tertiary Fixed Dim",
+            fixedDimColor = fixedAccentColors.tertiaryFixedDim,
+            onFixedText = "On Tertiary Fixed",
+            onFixedColor = fixedAccentColors.onTertiaryFixed,
+            onFixedVariantText = "On Tertiary Fixed Variant",
+            onFixedVariantColor = fixedAccentColors.onTertiaryFixedVariant,
+            onCopy = onCopy,
+            modifier = Modifier.width(ColorCellWidth)
+        )
+    }
+}
 
 @Composable
 private fun SurfaceSection(
     onCopy: (String) -> Unit
 ) {
-
     // The surface section has the width of 3 cell blocks without any padding in between
     val surfaceSectionWidth = ((ColorCellWidth * 3) + (ColorTableCellPadding * 2))
 
@@ -394,8 +417,9 @@ private fun SurfaceSection(
 
         // The last column with the inverse colors has the same size as the surface section with two
         // rows of big cells and a row of small cells with padding in between
-        val inverseColumnHeight =
-            (DefaultColorBlockStyle.bigCellHeight * 2) + DefaultColorBlockStyle.smallCellHeight + (ColorTableCellPadding * 2)
+        val inverseColumnHeight = (DefaultColorBlockStyle.bigCellHeight * 2) +
+            DefaultColorBlockStyle.smallCellHeight + (ColorTableCellPadding * 2)
+
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.height(inverseColumnHeight)
@@ -411,7 +435,6 @@ private fun SurfaceSection(
                     style = ForceSmallColorBlockStyle,
                     modifier = Modifier.width(ColorCellWidth)
                 )
-
 
                 ColorBlockBasic(
                     text = "Inverse On Surface",
