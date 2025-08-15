@@ -15,6 +15,8 @@ subprojects {
 
     detekt {
         config.from(rootProject.files("config/detekt/detekt.yml"))
+        // We can use ./gradlew detektBaseline to generate a baseline.xml and ignore current issues.
+        // baseline = file("${rootProject.projectDir}/config/baseline.xml")
     }
 
     dependencies {
