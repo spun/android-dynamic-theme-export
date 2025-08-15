@@ -38,7 +38,6 @@ internal fun Modifier.freeScroll(
     verticalReverseScrolling: Boolean = false,
     flingBehavior: FlingBehavior? = null,
 ): Modifier = composed {
-
     val velocityTracker = remember { VelocityTracker() }
     val fling = flingBehavior ?: ScrollableDefaults.flingBehavior()
 
@@ -101,7 +100,6 @@ internal fun Modifier.freeScrollWithTransformGesture(
     flingBehavior: FlingBehavior? = null,
     onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float) -> Unit,
 ): Modifier = composed {
-
     val velocityTracker = remember { VelocityTracker() }
     val fling = flingBehavior ?: ScrollableDefaults.flingBehavior()
 
@@ -164,7 +162,6 @@ private fun onDrag(
     velocityTracker: VelocityTracker,
     coroutineScope: CoroutineScope,
 ) {
-
     coroutineScope.launch {
         state.horizontalScrollState.scrollBy(
             if (horizontalReverseScrolling) dragAmount.x else -dragAmount.x
@@ -186,19 +183,20 @@ private fun onDrag(
 
     changeList.forEach { (time, pos) ->
         val position = Offset(
-            x = pos.x - if (horizontalReverseScrolling)
+            x = pos.x - if (horizontalReverseScrolling) {
                 -state.horizontalScrollState.value
-            else
-                state.horizontalScrollState.value,
-            y = pos.y - if (verticalReverseScrolling)
+            } else {
+                state.horizontalScrollState.value
+            },
+            y = pos.y - if (verticalReverseScrolling) {
                 -state.verticalScrollState.value
-            else
-                state.verticalScrollState.value,
+            } else {
+                state.verticalScrollState.value
+            },
         )
         velocityTracker.addPosition(time, position)
     }
 }
-
 
 private fun onEnd(
     velocityTracker: VelocityTracker,

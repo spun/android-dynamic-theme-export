@@ -252,12 +252,10 @@ fun ColorRolesTable(
     }
 }
 
-
 @Composable
 private fun SurfaceSection(
     onCopy: (String) -> Unit
 ) {
-
     // The surface section has the width of 3 cell blocks without any padding in between
     val surfaceSectionWidth = ((ColorCellWidth * 3) + (ColorTableCellPadding * 2))
 
@@ -394,8 +392,9 @@ private fun SurfaceSection(
 
         // The last column with the inverse colors has the same size as the surface section with two
         // rows of big cells and a row of small cells with padding in between
-        val inverseColumnHeight =
-            (DefaultColorBlockStyle.bigCellHeight * 2) + DefaultColorBlockStyle.smallCellHeight + (ColorTableCellPadding * 2)
+        val inverseColumnHeight = (DefaultColorBlockStyle.bigCellHeight * 2) +
+            DefaultColorBlockStyle.smallCellHeight + (ColorTableCellPadding * 2)
+
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.height(inverseColumnHeight)
@@ -411,7 +410,6 @@ private fun SurfaceSection(
                     style = ForceSmallColorBlockStyle,
                     modifier = Modifier.width(ColorCellWidth)
                 )
-
 
                 ColorBlockBasic(
                     text = "Inverse On Surface",

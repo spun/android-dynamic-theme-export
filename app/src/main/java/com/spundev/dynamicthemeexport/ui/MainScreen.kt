@@ -41,7 +41,6 @@ fun MainScreen(
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.systemBarsPadding()) {
-
             var currentScreenIndex by rememberSaveable { mutableIntStateOf(0) }
             MainTopBar(
                 isDarkTheme = isDarkTheme,

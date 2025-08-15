@@ -35,7 +35,6 @@ internal class FreeScrollState(
      */
     val yValue: Int get() = verticalScrollState.value
 
-
     /**
      * maximum bound for [xValue], or [Int.MAX_VALUE] if still unknown
      */
@@ -45,7 +44,6 @@ internal class FreeScrollState(
      * maximum bound for [yValue], or [Int.MAX_VALUE] if still unknown
      */
     val yMaxValue: Int get() = verticalScrollState.maxValue
-
 
     /**
      * Jump instantly by [offset] pixels.
