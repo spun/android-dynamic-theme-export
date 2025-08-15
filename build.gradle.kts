@@ -3,4 +3,15 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
     alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.detekt)
+}
+
+subprojects {
+    apply {
+        plugin("io.gitlab.arturbosch.detekt")
+    }
+
+    detekt {
+        config.from(rootProject.files("config/detekt/detekt.yml"))
+    }
 }
