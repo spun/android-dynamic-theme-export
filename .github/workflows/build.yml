@@ -44,7 +44,7 @@ jobs:
         run: ./gradlew lint
 
       - name: Run Detekt 🔍
-        run: ./gradlew detekt
+        run: ./gradlew detektDebug
 
       - name: Run local tests 🧪
         run: ./gradlew test
