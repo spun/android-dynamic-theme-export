@@ -7,8 +7,8 @@ import com.spundev.dynamicthemeexport.data.ThemeColorPack
 
 @Composable
 fun DynamicExportTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     themeColorPack: ThemeColorPack,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
