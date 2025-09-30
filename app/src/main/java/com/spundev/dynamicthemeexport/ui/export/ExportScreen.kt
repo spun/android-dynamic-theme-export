@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalIconButton
@@ -102,7 +99,10 @@ fun ExportScreen(
                 val shareIntent = Intent.createChooser(sendIntent, null)
                 context.startActivity(shareIntent)
             }) {
-                Icon(imageVector = Icons.Default.Share, contentDescription = "Share")
+                Icon(
+                    painter = painterResource(R.drawable.ic_share_24),
+                    contentDescription = "Share"
+                )
             }
         }
 
@@ -166,7 +166,10 @@ private fun ColorFormatSelection(
                     },
                     leadingIcon = {
                         if (format == colorFormat) {
-                            Icon(Icons.Outlined.Check, contentDescription = null)
+                            Icon(
+                                painter = painterResource(R.drawable.ic_check_24),
+                                contentDescription = null
+                            )
                         }
                     }
                 )
