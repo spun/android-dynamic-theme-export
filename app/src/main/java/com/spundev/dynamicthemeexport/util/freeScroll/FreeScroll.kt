@@ -1,228 +1,89 @@
 package com.spundev.dynamicthemeexport.util.freeScroll
 
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.ScrollableDefaults
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.foundation.checkScrollableContainerConstraints
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable2D
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.util.VelocityTracker
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-
-// Source: https://github.com/chihsuanwu/compose-free-scroll
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.util.fastCoerceIn
+import androidx.compose.ui.util.fastRoundToInt
 
 /**
- * Modify element to allow to scroll in both directions.
- * @param state state of the scroll
- * @param enabled whether the scroll is enabled
- * @param horizontalReverseScrolling reverse the horizontal scrolling direction,
- * when true, 0 [FreeScrollState.xValue] will mean right, otherwise left.
- * @param verticalReverseScrolling reverse the vertical scrolling direction,
- * when true, 0 [FreeScrollState.yValue] will mean bottom, otherwise top.
- * @param flingBehavior logic describing fling behavior when drag has finished with velocity.
- * If null, default from [ScrollableDefaults.flingBehavior] will be used.
+ * Utility modifier that combines all necessary steps to use a [Modifier.scrollable2D].
  */
-internal fun Modifier.freeScroll(
+fun Modifier.freeScroll(
     state: FreeScrollState,
-    enabled: Boolean = true,
-    horizontalReverseScrolling: Boolean = false,
-    verticalReverseScrolling: Boolean = false,
-    flingBehavior: FlingBehavior? = null,
-): Modifier = composed {
+): Modifier {
+    // We could have used Modifier.layout instead of creating a new Modifier.Node, but we can use
+    // this as an example of how to use Modifier.Node.
+    return this
+        .clipToBounds()
+        .scrollable2D(state.scrollable2DState) then FreeScrollElement(state)
+}
 
-    val velocityTracker = remember { VelocityTracker() }
-    val fling = flingBehavior ?: ScrollableDefaults.flingBehavior()
+private data class FreeScrollElement(
+    val state: FreeScrollState
+) : ModifierNodeElement<FreeScrollNode>() {
+    override fun create(): FreeScrollNode = FreeScrollNode(state)
 
-    this
-        .horizontalScroll(
-            state = state.horizontalScrollState,
-            enabled = false,
-            reverseScrolling = horizontalReverseScrolling
-        )
-        .verticalScroll(
-            state = state.verticalScrollState,
-            enabled = false,
-            reverseScrolling = verticalReverseScrolling
-        )
-        .pointerInput(enabled, horizontalReverseScrolling, verticalReverseScrolling) {
-            if (!enabled) return@pointerInput
+    override fun update(node: FreeScrollNode) {
+        node.state = state
+    }
 
-            coroutineScope {
-                detectDragGestures(
-                    onDragStart = { },
-                    onDrag = { change, dragAmount ->
-                        change.consume()
-                        onDrag(
-                            change = change,
-                            dragAmount = dragAmount,
-                            state = state,
-                            horizontalReverseScrolling = horizontalReverseScrolling,
-                            verticalReverseScrolling = verticalReverseScrolling,
-                            velocityTracker = velocityTracker,
-                            coroutineScope = this
-                        )
-                    },
-                    onDragEnd = {
-                        onEnd(
-                            velocityTracker = velocityTracker,
-                            state = state,
-                            horizontalReverseScrolling = horizontalReverseScrolling,
-                            verticalReverseScrolling = verticalReverseScrolling,
-                            flingBehavior = fling,
-                            coroutineScope = this
-                        )
-                    }
-                )
-            }
-        }
+    override fun InspectorInfo.inspectableProperties() {
+        name = "freeScroll"
+        properties["state"] = state
+    }
 }
 
 /**
- * Modify element to allow to scroll in both directions, and detect transform gestures.
- * If you don't need to detect transform gestures, use [freeScroll] instead.
- *
- * See [androidx.compose.foundation.gestures.detectTransformGestures] for more details.
+ * Modifier that applies [FreeScrollState.offset] to the layout
+ * This is really similar to [androidx.compose.foundation.ScrollNode] from Scroll.kt
  */
-internal fun Modifier.freeScrollWithTransformGesture(
-    state: FreeScrollState,
-    enabled: Boolean = true,
-    panZoomLock: Boolean = false,
-    horizontalReverseScrolling: Boolean = false,
-    verticalReverseScrolling: Boolean = false,
-    flingBehavior: FlingBehavior? = null,
-    onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float) -> Unit,
-): Modifier = composed {
+private class FreeScrollNode(
+    var state: FreeScrollState
+) : LayoutModifierNode, Modifier.Node() {
 
-    val velocityTracker = remember { VelocityTracker() }
-    val fling = flingBehavior ?: ScrollableDefaults.flingBehavior()
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        // This checks if the container was measured with the infinity constraints in the direction
+        // of scrolling and gives a detailed explanation. Instead of writing our own check, we are
+        // reusing the one from [ScrollNode]. This is why it needs an Orientation and why we call it
+        // twice.
+        checkScrollableContainerConstraints(constraints, Orientation.Horizontal)
+        checkScrollableContainerConstraints(constraints, Orientation.Vertical)
 
-    this
-        .horizontalScroll(
-            state = state.horizontalScrollState,
-            enabled = false,
-            reverseScrolling = horizontalReverseScrolling
+        val childConstraints = constraints.copy(
+            maxHeight = Constraints.Infinity,
+            maxWidth = Constraints.Infinity
         )
-        .verticalScroll(
-            state = state.verticalScrollState,
-            enabled = false,
-            reverseScrolling = verticalReverseScrolling
-        )
-        .pointerInput(enabled, horizontalReverseScrolling, verticalReverseScrolling) {
-            if (!enabled) return@pointerInput
+        val placeable = measurable.measure(childConstraints)
+        val width = placeable.width.coerceAtMost(constraints.maxWidth)
+        val height = placeable.height.coerceAtMost(constraints.maxHeight)
+        val scrollHeight = placeable.height - height
+        val scrollWidth = placeable.width - width
+        state.maxOffset = IntOffset(scrollWidth, scrollHeight)
+        return layout(width, height) {
+            val scrollX = state.offset.x.fastRoundToInt().fastCoerceIn(0, scrollWidth)
+            val scrollY = state.offset.y.fastRoundToInt().fastCoerceIn(0, scrollHeight)
+            val xOffset = -scrollX
+            val yOffset = -scrollY
 
-            coroutineScope {
-                detectFreeScrollGestures(
-                    panZoomLock = panZoomLock,
-                    onGesture = { centroid, pan, zoom, rotation, change ->
-                        onDrag(
-                            change = change,
-                            dragAmount = pan,
-                            state = state,
-                            horizontalReverseScrolling = horizontalReverseScrolling,
-                            verticalReverseScrolling = verticalReverseScrolling,
-                            velocityTracker = velocityTracker,
-                            coroutineScope = this
-                        )
-                        onGesture(centroid, pan, zoom, rotation)
-                    },
-                    onEnd = {
-                        onEnd(
-                            velocityTracker = velocityTracker,
-                            state = state,
-                            horizontalReverseScrolling = horizontalReverseScrolling,
-                            verticalReverseScrolling = verticalReverseScrolling,
-                            flingBehavior = fling,
-                            coroutineScope = this
-                        )
-                    }
-                )
-            }
-        }
-}
-
-/**
- * If [change] is null, it means that the id of the pointer is changed. This happens when
- * freeScrollWithTransformGesture is used. In this case, we need to reset the velocity tracker to
- * avoid incorrect velocity calculation.
- */
-@OptIn(ExperimentalComposeUiApi::class)
-private fun onDrag(
-    change: PointerInputChange?,
-    dragAmount: Offset,
-    state: FreeScrollState,
-    horizontalReverseScrolling: Boolean,
-    verticalReverseScrolling: Boolean,
-    velocityTracker: VelocityTracker,
-    coroutineScope: CoroutineScope,
-) {
-
-    coroutineScope.launch {
-        state.horizontalScrollState.scrollBy(
-            if (horizontalReverseScrolling) dragAmount.x else -dragAmount.x
-        )
-        state.verticalScrollState.scrollBy(
-            if (verticalReverseScrolling) dragAmount.y else -dragAmount.y
-        )
-    }
-
-    if (change == null) {
-        velocityTracker.resetTracking()
-        return
-    }
-
-    // Add historical position to velocity tracker to increase accuracy
-    val changeList = change.historical.map {
-        it.uptimeMillis to it.position
-    } + (change.uptimeMillis to change.position)
-
-    changeList.forEach { (time, pos) ->
-        val position = Offset(
-            x = pos.x - if (horizontalReverseScrolling)
-                -state.horizontalScrollState.value
-            else
-                state.horizontalScrollState.value,
-            y = pos.y - if (verticalReverseScrolling)
-                -state.verticalScrollState.value
-            else
-                state.verticalScrollState.value,
-        )
-        velocityTracker.addPosition(time, position)
-    }
-}
-
-
-private fun onEnd(
-    velocityTracker: VelocityTracker,
-    state: FreeScrollState,
-    horizontalReverseScrolling: Boolean,
-    verticalReverseScrolling: Boolean,
-    flingBehavior: FlingBehavior,
-    coroutineScope: CoroutineScope
-) {
-    val velocity = velocityTracker.calculateVelocity()
-    velocityTracker.resetTracking()
-
-    // Launch two animation separately to make sure they work simultaneously.
-    coroutineScope.launch {
-        state.horizontalScrollState.scroll {
-            with(flingBehavior) {
-                performFling(if (horizontalReverseScrolling) velocity.x else -velocity.x)
-            }
-        }
-    }
-    coroutineScope.launch {
-        state.verticalScrollState.scroll {
-            with(flingBehavior) {
-                performFling(if (verticalReverseScrolling) velocity.y else -velocity.y)
+            // Tagging as direct manipulation, such that consumers of this offset can decide whether
+            // to exclude this offset on their coordinates calculation. Such as whether an
+            // `approachLayout` will animate it or directly apply the offset without animation.
+            withMotionFrameOfReferencePlacement {
+                placeable.placeRelativeWithLayer(xOffset, yOffset)
             }
         }
     }

@@ -96,17 +96,17 @@ fun ColorRolesTable(
     }
 
     var zoom: Float by remember { mutableFloatStateOf(1f) }
+    val freeScrollState = rememberFreeScrollState()
     Column(
         verticalArrangement = Arrangement.spacedBy(ColorTableSectionPadding),
         modifier = Modifier
             .fillMaxSize()
-            .freeScroll(rememberFreeScrollState())
-            // Use a special pointerInput instead of freeScrollWithTransformGesture
+            .freeScroll(freeScrollState)
             .pointerInput(Unit) {
-                // NOTE: We need to do this instead of detectGestures because detectGestures has a
-                // few check that break the while loop and that are triggered by the
-                // combinedClickable in our color blocks (copy-to-clipboard feature).
-                // This is a extremely simplify version that only calculates zoom changes.
+                // NOTE: We need to do this instead of using detectGestures because detectGestures
+                // has a few checks triggered by the combinedClickable in our color blocks
+                // (copy-to-clipboard feature) that break the while loop.
+                // This is a simplified version that only calculates zoom changes.
                 awaitEachGesture {
                     awaitFirstDown(requireUnconsumed = false)
                     while (true) {
