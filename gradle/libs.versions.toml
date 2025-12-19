@@ -1,9 +1,9 @@
 [versions]
 androidGradlePlugin = "8.13.2"
-androidxActivity = "1.12.1"
-androidxComposeBom = "2025.12.00"
+androidxActivity = "1.12.2"
+androidxComposeBom = "2025.12.01"
 androidxTestExt = "1.3.0"
-kotlin = "2.2.21"
+kotlin = "2.3.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
