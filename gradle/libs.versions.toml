@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.13.2"
+androidGradlePlugin = "9.0.0"
 androidxActivity = "1.12.2"
 androidxComposeBom = "2025.12.01"
 androidxTestExt = "1.3.0"
@@ -16,6 +16,5 @@ androidx-test-ext = { group = "androidx.test.ext", name = "junit-ktx", version.r
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
