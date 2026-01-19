@@ -132,7 +132,11 @@ private fun LightDarkSelector(
         uncheckedThumbColor = switchDefaultsColors.checkedThumbColor,
         uncheckedTrackColor = switchDefaultsColors.checkedTrackColor,
         uncheckedBorderColor = switchDefaultsColors.checkedBorderColor,
-        uncheckedIconColor = switchDefaultsColors.checkedIconColor
+        // We use checkedTrackColor for the iconColor to fix an issue with
+        // dynamic dark color schemes on devices running API 36.1 where
+        // the default colors might not have enough contrast (b/462919296).
+        checkedIconColor = switchDefaultsColors.checkedTrackColor,
+        uncheckedIconColor = switchDefaultsColors.checkedTrackColor,
     )
 
     Switch(
