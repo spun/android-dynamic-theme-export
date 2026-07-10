@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import com.spundev.dynamicthemeexport.data.ElevatedSurfaceLevels
-import com.spundev.dynamicthemeexport.data.ThemeColorPack
 import com.spundev.dynamicthemeexport.ext.getElevatedSurfaceLevels
 import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockBasic
 import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockPair
@@ -553,12 +553,15 @@ private val ColorCellWidth = 180.dp
 )
 @Composable
 private fun ColorRolesTablePreview() {
+    // We don't need a ThemeColorPack for PreviewScreen.
+    // Get just the dynamic ColorScheme we need.
     val context = LocalContext.current
-    val themeColorPack = ThemeColorPack(
-        lightColorScheme = dynamicLightColorScheme(context),
-        darkColorScheme = dynamicDarkColorScheme(context)
-    )
-    DynamicExportTheme(themeColorPack = themeColorPack) {
+    val colorScheme = if (isSystemInDarkTheme()) {
+        dynamicDarkColorScheme(context)
+    } else {
+        dynamicLightColorScheme(context)
+    }
+    DynamicExportTheme(colorScheme = colorScheme) {
         ColorRolesTable()
     }
 }

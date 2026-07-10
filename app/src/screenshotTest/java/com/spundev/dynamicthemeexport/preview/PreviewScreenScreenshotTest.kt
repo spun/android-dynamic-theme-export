@@ -1,6 +1,7 @@
 package com.spundev.dynamicthemeexport.preview
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -17,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Wallpapers.GREEN_DOMINATED_EXAMPLE
 import androidx.compose.ui.tooling.preview.Wallpapers.RED_DOMINATED_EXAMPLE
 import androidx.compose.ui.tooling.preview.Wallpapers.YELLOW_DOMINATED_EXAMPLE
 import com.android.tools.screenshot.PreviewTest
-import com.spundev.dynamicthemeexport.data.ThemeColorPack
 import com.spundev.dynamicthemeexport.ui.preview.ColorRolesTable
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 
@@ -71,12 +71,15 @@ private const val PREVIEW_PERFECT_FIT = "spec:width=780dp,height=810dp,dpi=160"
 )
 @Composable
 fun PreviewScreenDynamicColorsPreview() {
+    // We don't need a ThemeColorPack for PreviewScreen.
+    // Get just the dynamic ColorScheme we need.
     val context = LocalContext.current
-    val themeColorPack = ThemeColorPack(
-        lightColorScheme = dynamicLightColorScheme(context),
-        darkColorScheme = dynamicDarkColorScheme(context)
-    )
-    DynamicExportTheme(themeColorPack = themeColorPack) {
+    val colorScheme = if (isSystemInDarkTheme()) {
+        dynamicDarkColorScheme(context)
+    } else {
+        dynamicLightColorScheme(context)
+    }
+    DynamicExportTheme(colorScheme = colorScheme) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.background(MaterialTheme.colorScheme.surface)

@@ -6,16 +6,12 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import com.spundev.dynamicthemeexport.data.ThemeColorPack
+import com.spundev.dynamicthemeexport.data.rememberThemeColorPack
 import com.spundev.dynamicthemeexport.ui.MainScreen
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 
@@ -29,16 +25,10 @@ class MainActivity : ComponentActivity() {
             val initialDarkThemeValue = isSystemInDarkTheme()
             var isDarkTheme by rememberSaveable { mutableStateOf(initialDarkThemeValue) }
 
-            // We are getting the light and dark dynamic themes here instead of inside
-            // DynamicExportTheme composable because the "MainScreen" needs both colorSchemes to
-            // populate the table and the export content.
-            val context = LocalContext.current
-            val themeColorPack = remember(context) {
-                ThemeColorPack(
-                    lightColorScheme = dynamicLightColorScheme(context),
-                    darkColorScheme = dynamicDarkColorScheme(context)
-                )
-            }
+            // We are getting a "pack" with light and dark dynamic themes here instead of
+            // inside DynamicExportTheme composable because our "MainScreen" needs both
+            // colorSchemes to populate the export pane.
+            val themeColorPack = rememberThemeColorPack()
 
             // Update the edge to edge configuration to match the theme
             DisposableEffect(isDarkTheme) {
@@ -56,8 +46,9 @@ class MainActivity : ComponentActivity() {
             }
 
             DynamicExportTheme(
-                darkTheme = isDarkTheme,
-                themeColorPack = themeColorPack,
+                // Get the correct ColorScheme for the current isDarkTheme
+                // (our light/dark toggle) selected value.
+                colorScheme = themeColorPack.getColorScheme(isDarkTheme),
             ) {
                 MainScreen(
                     isDarkTheme = isDarkTheme,
