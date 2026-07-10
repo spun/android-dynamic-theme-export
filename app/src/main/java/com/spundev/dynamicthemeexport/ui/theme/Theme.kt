@@ -1,19 +1,16 @@
 package com.spundev.dynamicthemeexport.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import com.spundev.dynamicthemeexport.data.ThemeColorPack
-
 
 @Composable
 fun DynamicExportTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    themeColorPack: ThemeColorPack,
+    colorScheme: ColorScheme,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = if (darkTheme) themeColorPack.darkColorScheme else themeColorPack.lightColorScheme,
+        colorScheme = colorScheme,
         typography = Typography,
         content = content
     )
