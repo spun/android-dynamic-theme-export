@@ -22,7 +22,7 @@ import com.spundev.dynamicthemeexport.ui.preview.ColorRolesTable
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 
 // Device size that fits the full preview table
-private const val PREVIEW_PERFECT_FIT = "spec:width=780dp,height=810dp"
+private const val PREVIEW_PERFECT_FIT = "spec:width=780dp,height=810dp,dpi=160"
 
 @PreviewTest
 @Preview(
