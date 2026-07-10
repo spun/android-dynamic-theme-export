@@ -46,49 +46,8 @@ import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
 import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
 
-// From ColorSchemeFixedAccentColorSample
-// Source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/samples/src/main/java/androidx/compose/material3/samples/ColorSchemeSamples.kt;l=32;bpv=0;bpt=0
-private data class FixedAccentColors(
-    val primaryFixed: Color,
-    val onPrimaryFixed: Color,
-    val secondaryFixed: Color,
-    val onSecondaryFixed: Color,
-    val tertiaryFixed: Color,
-    val onTertiaryFixed: Color,
-    val primaryFixedDim: Color,
-    val secondaryFixedDim: Color,
-    val tertiaryFixedDim: Color,
-    // NOTE: Variant colors are missing in the original FixedAccentColors
-    val onPrimaryFixedVariant: Color,
-    val onSecondaryFixedVariant: Color,
-    val onTertiaryFixedVariant: Color,
-)
-
 @Composable
-fun ColorRolesTable(
-    themeColorPack: ThemeColorPack
-) {
-    // From ColorSchemeFixedAccentColorSample
-    // Source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/samples/src/main/java/androidx/compose/material3/samples/ColorSchemeSamples.kt;l=32;bpv=0;bpt=0
-    val fixedAccentColors = remember(themeColorPack) {
-        val light = themeColorPack.lightColorScheme
-        val dark = themeColorPack.darkColorScheme
-        FixedAccentColors(
-            primaryFixed = light.primaryContainer,
-            onPrimaryFixed = light.onPrimaryContainer,
-            secondaryFixed = light.secondaryContainer,
-            onSecondaryFixed = light.onSecondaryContainer,
-            tertiaryFixed = light.tertiaryContainer,
-            onTertiaryFixed = light.onTertiaryContainer,
-            primaryFixedDim = dark.primary,
-            secondaryFixedDim = dark.secondary,
-            tertiaryFixedDim = dark.tertiary,
-            onPrimaryFixedVariant = light.primary,
-            onSecondaryFixedVariant = light.secondary,
-            onTertiaryFixedVariant = light.tertiary,
-        )
-    }
-
+fun ColorRolesTable() {
     // Legacy elevated surface colors
     val currentColorScheme = MaterialTheme.colorScheme
     val elevatedSurfaceLevels = remember(currentColorScheme) {
@@ -203,39 +162,39 @@ fun ColorRolesTable(
         Row(horizontalArrangement = Arrangement.spacedBy(ColorTableCellPadding)) {
             ColorBlockWithFixedAccent(
                 fixedText = "Primary Fixed",
-                fixedColor = fixedAccentColors.primaryFixed,
+                fixedColor = MaterialTheme.colorScheme.primaryFixed,
                 fixedDimText = "Primary Fixed Dim",
-                fixedDimColor = fixedAccentColors.primaryFixedDim,
+                fixedDimColor = MaterialTheme.colorScheme.primaryFixedDim,
                 onFixedText = "On Primary Fixed",
-                onFixedColor = fixedAccentColors.onPrimaryFixed,
+                onFixedColor = MaterialTheme.colorScheme.onPrimaryFixed,
                 onFixedVariantText = "On Primary Fixed Variant",
-                onFixedVariantColor = fixedAccentColors.onPrimaryFixedVariant,
+                onFixedVariantColor = MaterialTheme.colorScheme.onPrimaryFixedVariant,
                 onCopy = onCopy,
                 modifier = Modifier.width(ColorCellWidth)
             )
 
             ColorBlockWithFixedAccent(
                 fixedText = "Secondary Fixed",
-                fixedColor = fixedAccentColors.secondaryFixed,
+                fixedColor = MaterialTheme.colorScheme.secondaryFixed,
                 fixedDimText = "Secondary Fixed Dim",
-                fixedDimColor = fixedAccentColors.secondaryFixedDim,
+                fixedDimColor = MaterialTheme.colorScheme.secondaryFixedDim,
                 onFixedText = "On Secondary Fixed",
-                onFixedColor = fixedAccentColors.onSecondaryFixed,
+                onFixedColor = MaterialTheme.colorScheme.onSecondaryFixed,
                 onFixedVariantText = "On Secondary Fixed Variant",
-                onFixedVariantColor = fixedAccentColors.onSecondaryFixedVariant,
+                onFixedVariantColor = MaterialTheme.colorScheme.onSecondaryFixedVariant,
                 onCopy = onCopy,
                 modifier = Modifier.width(ColorCellWidth)
             )
 
             ColorBlockWithFixedAccent(
                 fixedText = "Tertiary Fixed",
-                fixedColor = fixedAccentColors.tertiaryFixed,
+                fixedColor = MaterialTheme.colorScheme.tertiaryFixed,
                 fixedDimText = "Tertiary Fixed Dim",
-                fixedDimColor = fixedAccentColors.tertiaryFixedDim,
+                fixedDimColor = MaterialTheme.colorScheme.tertiaryFixedDim,
                 onFixedText = "On Tertiary Fixed",
-                onFixedColor = fixedAccentColors.onTertiaryFixed,
+                onFixedColor = MaterialTheme.colorScheme.onTertiaryFixed,
                 onFixedVariantText = "On Tertiary Fixed Variant",
-                onFixedVariantColor = fixedAccentColors.onTertiaryFixedVariant,
+                onFixedVariantColor = MaterialTheme.colorScheme.onTertiaryFixedVariant,
                 onCopy = onCopy,
                 modifier = Modifier.width(ColorCellWidth)
             )
@@ -599,8 +558,7 @@ private fun ColorRolesTablePreview() {
         lightColorScheme = dynamicLightColorScheme(context),
         darkColorScheme = dynamicDarkColorScheme(context)
     )
-
     DynamicExportTheme(themeColorPack = themeColorPack) {
-        ColorRolesTable(themeColorPack = themeColorPack)
+        ColorRolesTable()
     }
 }

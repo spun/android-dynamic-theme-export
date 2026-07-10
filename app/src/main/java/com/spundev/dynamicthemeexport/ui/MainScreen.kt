@@ -57,7 +57,7 @@ fun MainScreen(
 
             // Screen content
             when (currentScreenIndex) {
-                0 -> ColorRolesTable(themeColorPack = themeColorPack)
+                0 -> ColorRolesTable()
                 1 -> ExportScreen(themeColorPack = themeColorPack)
                 else -> Text("Unknown")
             }
