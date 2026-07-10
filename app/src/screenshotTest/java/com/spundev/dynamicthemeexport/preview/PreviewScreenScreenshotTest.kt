@@ -81,7 +81,7 @@ fun PreviewScreenDynamicColorsPreview() {
             contentAlignment = Alignment.Center,
             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
-            ColorRolesTable(themeColorPack = themeColorPack)
+            ColorRolesTable()
         }
     }
 }
