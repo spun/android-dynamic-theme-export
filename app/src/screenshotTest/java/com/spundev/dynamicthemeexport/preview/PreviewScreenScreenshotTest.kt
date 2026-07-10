@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Wallpapers.GREEN_DOMINATED_EXAMPLE
 import androidx.compose.ui.tooling.preview.Wallpapers.RED_DOMINATED_EXAMPLE
 import androidx.compose.ui.tooling.preview.Wallpapers.YELLOW_DOMINATED_EXAMPLE
 import com.android.tools.screenshot.PreviewTest
-import com.spundev.dynamicthemeexport.ui.preview.ColorRolesTable
+import com.spundev.dynamicthemeexport.ui.preview.PreviewGridScreen
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 
 // Device size that fits the full preview table
@@ -84,7 +84,7 @@ fun PreviewScreenDynamicColorsPreview() {
             contentAlignment = Alignment.Center,
             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
-            ColorRolesTable()
+            PreviewGridScreen()
         }
     }
 }
