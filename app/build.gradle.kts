@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.spundev.dynamicthemeexport"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.spundev.dynamicthemeexport"
         minSdk = 31
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 4
         versionName = "0.1.4"
 
