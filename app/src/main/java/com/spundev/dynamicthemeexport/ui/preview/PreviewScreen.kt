@@ -1,5 +1,6 @@
 package com.spundev.dynamicthemeexport.ui.preview
 
+import android.content.ClipData
 import android.content.res.Configuration
 import android.os.Build
 import android.widget.Toast
@@ -24,14 +25,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
@@ -45,6 +47,7 @@ import com.spundev.dynamicthemeexport.ui.preview.components.ForceSmallColorBlock
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
 import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
+import kotlinx.coroutines.launch
 
 @Deprecated(
     message = "Use PreviewGridScreen instead.",
@@ -95,9 +98,15 @@ fun ColorRolesTable() {
     ) {
         // Copy to clipboard
         val context = LocalContext.current
-        val clipboardManager = LocalClipboardManager.current
-        val onCopy: (String) -> Unit = {
-            clipboardManager.setText(AnnotatedString(it))
+        val clipboard = LocalClipboard.current
+        val scope = rememberCoroutineScope()
+        val onCopy: suspend (text: String) -> Unit = { text ->
+            clipboard.setClipEntry(
+                clipEntry = ClipData.newPlainText(
+                    /* label = */ text,
+                    /* text = */ text
+                ).toClipEntry()
+            )
             // Only show a toast for Android 12 (32) and lower.
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                 Toast.makeText(context, "Text copied", Toast.LENGTH_SHORT).show()
@@ -110,13 +119,13 @@ fun ColorRolesTable() {
                     ColorBlockPair(
                         text = "Primary",
                         color = MaterialTheme.colorScheme.primary,
-                        onCopy = onCopy,
+                        onCopy = { scope.launch { onCopy(it) } },
                         modifier = Modifier.width(ColorCellWidth)
                     )
                     ColorBlockPair(
                         text = "Primary Container",
                         color = MaterialTheme.colorScheme.primaryContainer,
-                        onCopy = onCopy,
+                        onCopy = { scope.launch { onCopy(it) } },
                         modifier = Modifier.width(ColorCellWidth)
                     )
                 }
@@ -125,13 +134,13 @@ fun ColorRolesTable() {
                     ColorBlockPair(
                         text = "Secondary",
                         color = MaterialTheme.colorScheme.secondary,
-                        onCopy = onCopy,
+                        onCopy = { scope.launch { onCopy(it) } },
                         modifier = Modifier.width(ColorCellWidth)
                     )
                     ColorBlockPair(
                         text = "Secondary Container",
                         color = MaterialTheme.colorScheme.secondaryContainer,
-                        onCopy = onCopy,
+                        onCopy = { scope.launch { onCopy(it) } },
                         modifier = Modifier.width(ColorCellWidth)
                     )
                 }
@@ -140,13 +149,13 @@ fun ColorRolesTable() {
                     ColorBlockPair(
                         text = "Tertiary",
                         color = MaterialTheme.colorScheme.tertiary,
-                        onCopy = onCopy,
+                        onCopy = { scope.launch { onCopy(it) } },
                         modifier = Modifier.width(ColorCellWidth)
                     )
                     ColorBlockPair(
                         text = "Tertiary Container",
                         color = MaterialTheme.colorScheme.tertiaryContainer,
-                        onCopy = onCopy,
+                        onCopy = { scope.launch { onCopy(it) } },
                         modifier = Modifier.width(ColorCellWidth)
                     )
                 }
@@ -155,13 +164,13 @@ fun ColorRolesTable() {
                 ColorBlockPair(
                     text = "Error",
                     color = MaterialTheme.colorScheme.error,
-                    onCopy = onCopy,
+                    onCopy = { scope.launch { onCopy(it) } },
                     modifier = Modifier.width(ColorCellWidth)
                 )
                 ColorBlockPair(
                     text = "Error Container",
                     color = MaterialTheme.colorScheme.errorContainer,
-                    onCopy = onCopy,
+                    onCopy = { scope.launch { onCopy(it) } },
                     modifier = Modifier.width(ColorCellWidth)
                 )
             }
@@ -177,7 +186,7 @@ fun ColorRolesTable() {
                 onFixedColor = MaterialTheme.colorScheme.onPrimaryFixed,
                 onFixedVariantText = "On Primary Fixed Variant",
                 onFixedVariantColor = MaterialTheme.colorScheme.onPrimaryFixedVariant,
-                onCopy = onCopy,
+                onCopy = { scope.launch { onCopy(it) } },
                 modifier = Modifier.width(ColorCellWidth)
             )
 
@@ -190,7 +199,7 @@ fun ColorRolesTable() {
                 onFixedColor = MaterialTheme.colorScheme.onSecondaryFixed,
                 onFixedVariantText = "On Secondary Fixed Variant",
                 onFixedVariantColor = MaterialTheme.colorScheme.onSecondaryFixedVariant,
-                onCopy = onCopy,
+                onCopy = { scope.launch { onCopy(it) } },
                 modifier = Modifier.width(ColorCellWidth)
             )
 
@@ -203,18 +212,18 @@ fun ColorRolesTable() {
                 onFixedColor = MaterialTheme.colorScheme.onTertiaryFixed,
                 onFixedVariantText = "On Tertiary Fixed Variant",
                 onFixedVariantColor = MaterialTheme.colorScheme.onTertiaryFixedVariant,
-                onCopy = onCopy,
+                onCopy = { scope.launch { onCopy(it) } },
                 modifier = Modifier.width(ColorCellWidth)
             )
         }
 
-        SurfaceSection(onCopy = onCopy)
+        SurfaceSection(onCopy = { scope.launch { onCopy(it) } })
 
-        DeprecatedSection(onCopy = onCopy)
+        DeprecatedSection(onCopy = { scope.launch { onCopy(it) } })
 
         ElevatedSurfaceLevelsSection(
             colors = elevatedSurfaceLevels,
-            onCopy = onCopy
+            onCopy = { scope.launch { onCopy(it) } },
         )
     }
 }
