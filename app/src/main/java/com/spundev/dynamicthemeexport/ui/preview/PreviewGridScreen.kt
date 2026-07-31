@@ -2,6 +2,7 @@
 
 package com.spundev.dynamicthemeexport.ui.preview
 
+import android.content.ClipData
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -28,14 +29,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -50,6 +52,7 @@ import com.spundev.dynamicthemeexport.ui.preview.components.ForceSmallColorBlock
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
 import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
+import kotlinx.coroutines.launch
 
 @Composable
 fun PreviewGridScreen() {
@@ -64,9 +67,15 @@ fun PreviewGridScreen() {
 
     // Copy to clipboard
     val context = LocalContext.current
-    val clipboardManager = LocalClipboardManager.current
-    val onCopy: (String) -> Unit = {
-        clipboardManager.setText(AnnotatedString(it))
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
+    val onCopy: suspend (text: String) -> Unit = { text ->
+        clipboard.setClipEntry(
+            clipEntry = ClipData.newPlainText(
+                /* label = */ text,
+                /* text = */ text
+            ).toClipEntry()
+        )
         // Only show a toast for Android 12 (32) and lower.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             Toast.makeText(context, "Text copied", Toast.LENGTH_SHORT).show()
@@ -108,32 +117,32 @@ fun PreviewGridScreen() {
             .padding(16.dp)
     ) {
         PrimarySecondaryTertiarySection(
-            onCopy = onCopy,
+            onCopy = { scope.launch { onCopy(it) } },
             modifier = Modifier.gridItem(row = 1, column = 1)
         )
         ErrorsSection(
-            onCopy = onCopy,
+            onCopy = { scope.launch { onCopy(it) } },
             modifier = Modifier.gridItem(row = 1, column = 2)
         )
         FixedPrimarySecondaryTertiarySection(
-            onCopy = onCopy,
+            onCopy = { scope.launch { onCopy(it) } },
             modifier = Modifier.gridItem(row = 2, column = 1)
         )
         SurfacesSection(
-            onCopy = onCopy,
+            onCopy = { scope.launch { onCopy(it) } },
             modifier = Modifier.gridItem(row = 3, column = 1)
         )
         InverseSection(
-            onCopy = onCopy,
+            onCopy = { scope.launch { onCopy(it) } },
             modifier = Modifier.gridItem(row = 3, column = 2)
         )
         DeprecatedSection(
-            onCopy = onCopy,
+            onCopy = { scope.launch { onCopy(it) } },
             modifier = Modifier.gridItem(row = 4, column = 1)
         )
         LegacyElevatedSurfacesSection(
             colors = elevatedSurfaceLevels,
-            onCopy = onCopy,
+            onCopy = { scope.launch { onCopy(it) } },
             modifier = Modifier.gridItem(row = 5, column = 1)
         )
     }

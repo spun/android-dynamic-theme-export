@@ -1,5 +1,6 @@
 package com.spundev.dynamicthemeexport.ui.export
 
+import android.content.ClipData
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Build
@@ -25,15 +26,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,6 +45,7 @@ import com.spundev.dynamicthemeexport.data.ColorFormatSaver
 import com.spundev.dynamicthemeexport.data.ThemeColorPack
 import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
 import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
+import kotlinx.coroutines.launch
 
 @Composable
 fun ExportScreen(
@@ -56,9 +59,10 @@ fun ExportScreen(
         themeColorPackOutput = themeColorPack.toComposeThemeFile(colorFormat)
     }
 
+    // Copy to clipboard
     val context = LocalContext.current
-    // Copy
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -77,10 +81,17 @@ fun ExportScreen(
             // Copy
             FilledTonalIconButton(
                 onClick = {
-                    clipboardManager.setText(AnnotatedString(themeColorPackOutput))
-                    // Only show a toast for Android 12 (32) and lower.
-                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                        Toast.makeText(context, "Text copied", Toast.LENGTH_SHORT).show()
+                    scope.launch {
+                        clipboard.setClipEntry(
+                            clipEntry = ClipData.newPlainText(
+                                /* label = */ themeColorPackOutput,
+                                /* text = */ themeColorPackOutput
+                            ).toClipEntry()
+                        )
+                        // Only show a toast for Android 12 (32) and lower.
+                        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                            Toast.makeText(context, "Text copied", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             ) {
