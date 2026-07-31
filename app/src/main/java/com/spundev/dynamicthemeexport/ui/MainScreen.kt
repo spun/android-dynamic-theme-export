@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.spundev.dynamicthemeexport.R
 import com.spundev.dynamicthemeexport.data.ThemeColorPack
 import com.spundev.dynamicthemeexport.ui.export.ExportScreen
-import com.spundev.dynamicthemeexport.ui.preview.ColorRolesTable
+import com.spundev.dynamicthemeexport.ui.preview.PreviewGridScreen
 
 @Composable
 fun MainScreen(
@@ -57,7 +57,7 @@ fun MainScreen(
 
             // Screen content
             when (currentScreenIndex) {
-                0 -> ColorRolesTable()
+                0 -> PreviewGridScreen()
                 1 -> ExportScreen(themeColorPack = themeColorPack)
                 else -> Text("Unknown")
             }

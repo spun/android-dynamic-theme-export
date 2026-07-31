@@ -46,6 +46,14 @@ import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
 import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
 
+@Deprecated(
+    message = "Use PreviewGridScreen instead.",
+    replaceWith = ReplaceWith(
+        expression = "PreviewGridScreen()",
+        imports = ["com.spundev.dynamicthemeexport.ui.preview.PreviewGridScreen"]
+    ),
+    level = DeprecationLevel.WARNING
+)
 @Composable
 fun ColorRolesTable() {
     // Legacy elevated surface colors
