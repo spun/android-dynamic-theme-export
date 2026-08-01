@@ -37,7 +37,7 @@ data class ThemeColorPack(
             darkColorScheme.toColorStringMap(colorFormat).forEach { (key, value) ->
                 appendLine("    $key = $value,")
             }
-            appendLine(")")
+            append(")")
         }
     }
 
