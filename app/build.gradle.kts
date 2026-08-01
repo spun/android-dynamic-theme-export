@@ -1,14 +1,14 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.screenshot)
 }
 
 android {
     namespace = "com.spundev.dynamicthemeexport"
-    compileSdk = 37
+    compileSdk {
+        version = release(37)
+    }
 
     defaultConfig {
         applicationId = "com.spundev.dynamicthemeexport"
@@ -18,9 +18,6 @@ android {
         versionName = "0.1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
     }
 
     signingConfigs {
@@ -37,12 +34,9 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            optimization {
+                enable = true
+            }
             signingConfig = signingConfigs.getByName("release")
 
             // Switch to debug signingConfigs to create release builds during development
@@ -56,7 +50,7 @@ android {
                 create("pixel2api32") {
                     // Use device profiles you typically see in Android Studio.
                     device = "Pixel 2"
-                    // Use only API levels 27 and higher.
+                    // Use only API levels 27 and higher (our app is >= 31, so no issues here).
                     // ATDs should support only API level 30, but this is working fine ¿?
                     apiLevel = 32
                     // To include Google services, use "google-atd".
@@ -67,18 +61,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_1_8
-        }
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+    buildFeatures {
+        compose = true
     }
 
     experimentalProperties["android.experimental.enableScreenshotTest"] = true
@@ -96,14 +83,16 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
 
-    screenshotTestImplementation(libs.screenshot.validation.api)
-    screenshotTestImplementation(libs.androidx.compose.ui.tooling)
-
     // TESTS
-    // For instrumentation tests
-    androidTestImplementation(libs.androidx.test.ext)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
     // For local unit tests
-    testImplementation(libs.androidx.test.ext)
+    testImplementation(libs.junit)
+    // For instrumentation tests
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit)
+    // For screenshot tests
+    screenshotTestImplementation(libs.androidx.compose.ui.tooling)
+    screenshotTestImplementation(libs.screenshot.validation.api)
 }
