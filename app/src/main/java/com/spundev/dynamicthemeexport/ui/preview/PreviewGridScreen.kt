@@ -16,10 +16,15 @@ import androidx.compose.foundation.layout.Grid
 import androidx.compose.foundation.layout.GridTrackSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -82,6 +87,10 @@ fun PreviewGridScreen() {
         }
     }
 
+    val gridInsets = WindowInsets.safeDrawing.only(
+        WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+    )
+
     Grid(
         config = {
             // Split
@@ -114,6 +123,7 @@ fun PreviewGridScreen() {
                 scaleX = zoom
                 scaleY = zoom
             }
+            .windowInsetsPadding(gridInsets)
             .padding(16.dp)
     ) {
         PrimarySecondaryTertiarySection(
