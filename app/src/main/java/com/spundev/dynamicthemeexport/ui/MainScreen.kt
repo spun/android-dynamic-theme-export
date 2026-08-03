@@ -45,7 +45,7 @@ fun MainScreen(
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column {
-            var currentScreenIndex by rememberSaveable { mutableIntStateOf(0) }
+            var currentScreenIndex by rememberSaveable { mutableIntStateOf(1) }
             MainTopBar(
                 isDarkTheme = isDarkTheme,
                 currentScreenIndex = currentScreenIndex,
@@ -61,7 +61,11 @@ fun MainScreen(
             // Screen content
             when (currentScreenIndex) {
                 0 -> PreviewGridScreen()
-                1 -> ExportScreen(themeColorPack = themeColorPack)
+                1 -> ExportScreen(
+                    themeColorPack = themeColorPack,
+                    isDarkTheme = isDarkTheme,
+                )
+
                 else -> Text("Unknown")
             }
         }

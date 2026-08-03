@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,14 +69,15 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ExportScreen(
-    themeColorPack: ThemeColorPack
+    themeColorPack: ThemeColorPack,
+    isDarkTheme: Boolean,
 ) {
-    var themeColorPackOutput by remember { mutableStateOf("") }
+    var themeColorPackOutput by remember { mutableStateOf(AnnotatedString("")) }
     var colorFormat: ColorFormat by rememberSaveable(stateSaver = ColorFormatSaver) {
         mutableStateOf(ColorFormat.SRGBInteger)
     }
-    LaunchedEffect(themeColorPack, colorFormat) {
-        themeColorPackOutput = themeColorPack.toComposeThemeFile(colorFormat)
+    LaunchedEffect(themeColorPack, colorFormat, isDarkTheme) {
+        themeColorPackOutput = themeColorPack.toComposeThemeFile(colorFormat, isDarkTheme)
     }
 
     // Copy to clipboard
@@ -118,7 +120,7 @@ fun ExportScreen(
 @Composable
 private fun ExportScreenContent(
     colorFormat: ColorFormat,
-    codeText: String,
+    codeText: AnnotatedString,
     onColorFormatChange: (ColorFormat) -> Unit,
     onCopy: () -> Unit,
     onShare: () -> Unit,
@@ -237,7 +239,7 @@ private fun ColorFormatSelection(
 
 @Composable
 private fun ExportCodeViewer(
-    codeText: String,
+    codeText: AnnotatedString,
     displayCorners: DisplayCorners,
     windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
@@ -327,7 +329,7 @@ private fun ExportScreenContentWithBottomInsetBiggerThanCornerRadiusPreview(
         ) {
             ExportScreenContent(
                 colorFormat = ColorFormat.SRGBInteger,
-                codeText = text.repeat(6),
+                codeText = AnnotatedString(text.repeat(6)),
                 onColorFormatChange = { },
                 onCopy = { },
                 onShare = { },
@@ -388,7 +390,7 @@ private fun ExportScreenContentWithBottomInsetSmallerThanCornerRadiusPreview(
         ) {
             ExportScreenContent(
                 colorFormat = ColorFormat.SRGBInteger,
-                codeText = text.repeat(6),
+                codeText = AnnotatedString(text.repeat(6)),
                 onColorFormatChange = { },
                 onCopy = { },
                 onShare = { },
@@ -450,7 +452,7 @@ private fun ExportScreenContentWithBottomInsetSmallerThanCornerRadiusAndWeirdSha
         ) {
             ExportScreenContent(
                 colorFormat = ColorFormat.SRGBInteger,
-                codeText = text.repeat(6),
+                codeText = AnnotatedString(text.repeat(6)),
                 onColorFormatChange = { },
                 onCopy = { },
                 onShare = { },
@@ -490,7 +492,7 @@ private fun ExportScreenContentWithUnspecifiedCornerRadiusPreview(
         Box(modifier = Modifier.background(Color.White)) {
             ExportScreenContent(
                 colorFormat = ColorFormat.SRGBInteger,
-                codeText = text.repeat(6),
+                codeText = AnnotatedString(text.repeat(6)),
                 onColorFormatChange = { },
                 onCopy = { },
                 onShare = { },

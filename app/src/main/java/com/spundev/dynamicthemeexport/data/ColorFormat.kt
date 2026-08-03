@@ -16,32 +16,29 @@ sealed class ColorFormat(val formatter: (Color) -> String) {
      * Color(red = 1f, green = 1f, blue = 1f)
      */
     data object FloatComponents : ColorFormat({ color ->
-        "Color(red = ${color.red}f, green = ${color.green}f, blue = ${color.blue}f)"
+        "red = ${color.red}f, green = ${color.green}f, blue = ${color.blue}f"
     })
 
     /**
      * Color(0xFF0000FF)
      */
-    @OptIn(ExperimentalStdlibApi::class)
     data object SRGBInteger : ColorFormat({ color ->
-        "Color(0x${color.toArgb().toHexString(HexFormat.UpperCase)})"
+        "0x${color.toArgb().toHexString(HexFormat.UpperCase)}"
     })
 
     /**
      * Color(red = 0xFF, green = 0xFF, blue = 0xFF)
      */
-    @OptIn(ExperimentalStdlibApi::class)
     data object IntegerComponentsHex : ColorFormat({
         val color = it.toArgb()
         val customHexFormat = HexFormat {
             upperCase = true
             number.removeLeadingZeros = true
         }
-        "Color(" +
-            "red = 0x${color.red.toHexString(customHexFormat).padStart(2, '0')}, " +
-            "green = 0x${color.green.toHexString(customHexFormat).padStart(2, '0')}, " +
-            "blue = 0x${color.blue.toHexString(customHexFormat).padStart(2, '0')}" +
-        ")"
+        val red = "red = 0x${color.red.toHexString(customHexFormat).padStart(2, '0')}"
+        val green = "green = 0x${color.green.toHexString(customHexFormat).padStart(2, '0')}"
+        val blue = "blue = 0x${color.blue.toHexString(customHexFormat).padStart(2, '0')}"
+        "$red, $green, $blue"
     })
 
     /**
@@ -49,7 +46,7 @@ sealed class ColorFormat(val formatter: (Color) -> String) {
      */
     data object IntegerComponents : ColorFormat({
         val color = it.toArgb()
-        "Color(red = ${color.red}, green = ${color.green}, blue = ${color.blue})"
+        "red = ${color.red}, green = ${color.green}, blue = ${color.blue}"
     })
 }
 
