@@ -1,6 +1,5 @@
 package com.spundev.dynamicthemeexport.data
 
-import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -10,7 +9,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import com.spundev.dynamicthemeexport.ext.toFormattedColors
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +49,24 @@ private data class CodeColors(
 }
 
 /**
+ * Contains the two  [AnnotatedString] necessary to display a [ThemeColorPack] in our export screen.
+ * @param code The styled code that can be copied into a project.
+ * @param gutter The preview colors that will be overlaid with the code to add visual information
+ *  like in an IDE gutter.
+ */
+data class ThemeExport(
+    val code: AnnotatedString,
+    val gutter: AnnotatedString
+) {
+    companion object {
+        val Empty = ThemeExport(
+            code = AnnotatedString(""),
+            gutter = AnnotatedString("")
+        )
+    }
+}
+
+/**
  * Simple data class that holds both colorSchemes (light/dark). This can be used in screens that
  * need both color schemes like the export screen.
  */
@@ -58,10 +74,10 @@ data class ThemeColorPack(
     val lightColorScheme: ColorScheme,
     val darkColorScheme: ColorScheme
 ) {
-    suspend fun toComposeThemeFile(
+    suspend fun toComposeThemeExport(
         colorFormat: ColorFormat,
         isDark: Boolean
-    ): AnnotatedString = withContext(Dispatchers.Default) {
+    ): ThemeExport = withContext(Dispatchers.Default) {
         val colors = CodeColors.getCodeColors(isDark)
         // List of colorSchemes we are going to use to generate our theme file output and include
         // some custom values required to create them in compose.
@@ -69,17 +85,20 @@ data class ThemeColorPack(
             Triple("light", "lightColorScheme", lightColorScheme),
             Triple("dark", "darkColorScheme", darkColorScheme),
         )
-        buildAnnotatedString {
-            colorSchemeList.forEachIndexed { index, (schemeName, schemeFunction, colorScheme) ->
+        // Use two builders, one for the code and one for gutter with color previews
+        val codeBuilder = AnnotatedString.Builder()
+        val gutterBuilder = AnnotatedString.Builder()
+        colorSchemeList.forEachIndexed { index, (schemeName, schemeFunction, colorScheme) ->
+            codeBuilder.apply {
                 withStyle(SpanStyle(color = colors.keyword)) { append("val ") }
                 withStyle(SpanStyle(color = colors.declarationName)) { append("$schemeName ") }
                 withStyle(SpanStyle(color = colors.functionName)) { appendLine("= $schemeFunction(") }
+                gutterBuilder.appendLine()
                 colorScheme.toFormattedColors(colorFormat).forEach { formattedColor ->
                     val colorName = formattedColor.colorName
                     val colorValue = formattedColor.color
                     val colorOutput = formattedColor.output
                     val isEnabled = formattedColor.enabled
-                    withStyle(SpanStyle(colorValue)) { appendInlineContent("swatch", "▌") }
                     if (isEnabled) {
                         withStyle(SpanStyle(color = colors.parameterName)) { append("   $colorName = ") }
                         withStyle(SpanStyle(color = colors.functionName)) { append("Color(") }
@@ -88,18 +107,23 @@ data class ThemeColorPack(
                     } else {
                         withStyle(SpanStyle(color = colors.comment)) { appendLine("   // $colorName = Color($colorOutput),") }
                     }
+                    gutterBuilder.withStyle(SpanStyle(colorValue)) { appendLine("▌") }
                 }
                 withStyle(SpanStyle(color = colors.functionName)) { append(")") }
                 if (index < colorSchemeList.lastIndex) {
                     appendLine()
                     appendLine()
+                    gutterBuilder.apply {
+                        appendLine()
+                        appendLine()
+                    }
                 }
             }
         }
-    }
-
-    fun toViewsThemeFile() {
-        throw NotImplementedError()
+        ThemeExport(
+            code = codeBuilder.toAnnotatedString(),
+            gutter = gutterBuilder.toAnnotatedString()
+        )
     }
 
     fun getColorScheme(darkTheme: Boolean): ColorScheme =

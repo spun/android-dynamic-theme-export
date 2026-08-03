@@ -61,6 +61,7 @@ import com.spundev.dynamicthemeexport.R
 import com.spundev.dynamicthemeexport.data.ColorFormat
 import com.spundev.dynamicthemeexport.data.ColorFormatSaver
 import com.spundev.dynamicthemeexport.data.ThemeColorPack
+import com.spundev.dynamicthemeexport.data.ThemeExport
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 import com.spundev.dynamicthemeexport.util.DisplayCorners
 import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
@@ -73,12 +74,12 @@ fun ExportScreen(
     themeColorPack: ThemeColorPack,
     isDarkTheme: Boolean,
 ) {
-    var themeColorPackOutput by remember { mutableStateOf(AnnotatedString("")) }
+    var themeExportOutput by remember { mutableStateOf(ThemeExport.Empty) }
     var colorFormat: ColorFormat by rememberSaveable(stateSaver = ColorFormatSaver) {
         mutableStateOf(ColorFormat.SRGBInteger)
     }
     LaunchedEffect(themeColorPack, colorFormat, isDarkTheme) {
-        themeColorPackOutput = themeColorPack.toComposeThemeFile(colorFormat, isDarkTheme)
+        themeExportOutput = themeColorPack.toComposeThemeExport(colorFormat, isDarkTheme)
     }
 
     // Copy to clipboard
@@ -89,14 +90,14 @@ fun ExportScreen(
     val displayCorners = rememberDisplayCorners()
     ExportScreenContent(
         colorFormat = colorFormat,
-        codeText = themeColorPackOutput,
+        themeExport = themeExportOutput,
         onColorFormatChange = { colorFormat = it },
         onCopy = {
             scope.launch {
                 clipboard.setClipEntry(
                     clipEntry = ClipData.newPlainText(
-                        /* label = */ themeColorPackOutput,
-                        /* text = */ themeColorPackOutput
+                        /* label = */ themeExportOutput.code,
+                        /* text = */ themeExportOutput.code
                     ).toClipEntry()
                 )
                 // Only show a toast for Android 12 (32) and lower.
@@ -108,7 +109,7 @@ fun ExportScreen(
         onShare = {
             val sendIntent = Intent().apply {
                 action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, themeColorPackOutput)
+                putExtra(Intent.EXTRA_TEXT, themeExportOutput.code)
                 type = "text/plain"
             }
             val shareIntent = Intent.createChooser(sendIntent, null)
@@ -121,7 +122,7 @@ fun ExportScreen(
 @Composable
 private fun ExportScreenContent(
     colorFormat: ColorFormat,
-    codeText: AnnotatedString,
+    themeExport: ThemeExport,
     onColorFormatChange: (ColorFormat) -> Unit,
     onCopy: () -> Unit,
     onShare: () -> Unit,
@@ -144,7 +145,7 @@ private fun ExportScreenContent(
             modifier = Modifier
         )
         ExportCodeViewer(
-            codeText = codeText,
+            themeExport = themeExport,
             displayCorners = displayCorners,
             // Let ExportCodeViewer handle the bottom value of our contentPadding
             contentPadding = PaddingValues(bottom = contentPadding),
@@ -240,7 +241,7 @@ private fun ColorFormatSelection(
 
 @Composable
 private fun ExportCodeViewer(
-    codeText: AnnotatedString,
+    themeExport: ThemeExport,
     displayCorners: DisplayCorners,
     windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
@@ -272,7 +273,7 @@ private fun ExportCodeViewer(
     ) {
         SelectionContainer {
             Text(
-                text = codeText,
+                text = themeExport.code,
                 fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodySmall,
@@ -284,6 +285,19 @@ private fun ExportCodeViewer(
                 )
             )
         }
+        // Use same style from our code Text composable to make sure the position is correct
+        Text(
+            text = themeExport.gutter,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(
+                start = 8.dp,
+                top = 8.dp,
+                end = 8.dp,
+                bottom = codeViewerShape.innerBottomPadding
+            )
+        )
     }
 }
 
@@ -330,7 +344,10 @@ private fun ExportScreenContentWithBottomInsetBiggerThanCornerRadiusPreview(
         ) {
             ExportScreenContent(
                 colorFormat = ColorFormat.SRGBInteger,
-                codeText = AnnotatedString(text.repeat(6)),
+                themeExport = ThemeExport(
+                    code = AnnotatedString(text.repeat(6)),
+                    gutter = AnnotatedString("")
+                ),
                 onColorFormatChange = { },
                 onCopy = { },
                 onShare = { },
@@ -391,8 +408,10 @@ private fun ExportScreenContentWithBottomInsetSmallerThanCornerRadiusPreview(
         ) {
             ExportScreenContent(
                 colorFormat = ColorFormat.SRGBInteger,
-                codeText = AnnotatedString(text.repeat(6)),
-                onColorFormatChange = { },
+                themeExport = ThemeExport(
+                    code = AnnotatedString(text.repeat(6)),
+                    gutter = AnnotatedString("")
+                ), onColorFormatChange = { },
                 onCopy = { },
                 onShare = { },
                 displayCorners = displayCorners,
@@ -453,8 +472,10 @@ private fun ExportScreenContentWithBottomInsetSmallerThanCornerRadiusAndWeirdSha
         ) {
             ExportScreenContent(
                 colorFormat = ColorFormat.SRGBInteger,
-                codeText = AnnotatedString(text.repeat(6)),
-                onColorFormatChange = { },
+                themeExport = ThemeExport(
+                    code = AnnotatedString(text.repeat(6)),
+                    gutter = AnnotatedString("")
+                ), onColorFormatChange = { },
                 onCopy = { },
                 onShare = { },
                 displayCorners = displayCorners,
@@ -493,8 +514,10 @@ private fun ExportScreenContentWithUnspecifiedCornerRadiusPreview(
         Box(modifier = Modifier.background(Color.White)) {
             ExportScreenContent(
                 colorFormat = ColorFormat.SRGBInteger,
-                codeText = AnnotatedString(text.repeat(6)),
-                onColorFormatChange = { },
+                themeExport = ThemeExport(
+                    code = AnnotatedString(text.repeat(6)),
+                    gutter = AnnotatedString("")
+                ), onColorFormatChange = { },
                 onCopy = { },
                 onShare = { },
                 displayCorners = displayCorners,
