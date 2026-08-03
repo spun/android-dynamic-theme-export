@@ -1,5 +1,6 @@
 package com.spundev.dynamicthemeexport.ui
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -137,13 +138,22 @@ private fun LightDarkSelector(
         R.drawable.ic_light_mode_24
     }
 
+    val is36dot1 = Build.VERSION.SDK_INT_FULL == Build.VERSION_CODES_FULL.BAKLAVA_1
     val switchDefaultsColors = SwitchDefaults.colors()
     val switchColors = switchDefaultsColors.copy(
         // Use same values from checked
         uncheckedThumbColor = switchDefaultsColors.checkedThumbColor,
         uncheckedTrackColor = switchDefaultsColors.checkedTrackColor,
         uncheckedBorderColor = switchDefaultsColors.checkedBorderColor,
-        uncheckedIconColor = switchDefaultsColors.checkedIconColor
+        // We use checkedTrackColor for the iconColor to fix an issue with dynamic dark color
+        // schemes on devices running API 36.1 where the generated colors might not have enough
+        // contrast between the thumb (OnPrimary) and icon (OnPrimaryContainer). See b/462919296.
+        // NOTE: This is fixed/reverted on API >= 37, so we only need to change it for 36.1
+        uncheckedIconColor = if (is36dot1) switchDefaultsColors.checkedTrackColor else switchDefaultsColors.checkedIconColor,
+        // The checked state indicates that a light color scheme is active. We've only seen issues
+        // with dark color schemes, so this workaround shouldn't be necessary, but added it anyway
+        // to be safe.
+        checkedIconColor = if (is36dot1) switchDefaultsColors.checkedTrackColor else switchDefaultsColors.checkedIconColor,
     )
 
     Switch(
