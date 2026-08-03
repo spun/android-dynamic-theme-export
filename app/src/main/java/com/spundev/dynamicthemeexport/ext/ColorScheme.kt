@@ -2,69 +2,294 @@ package com.spundev.dynamicthemeexport.ext
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.spundev.dynamicthemeexport.data.ColorFormat
 import com.spundev.dynamicthemeexport.data.ElevatedSurfaceLevels
 
-fun ColorScheme.toColorStringMap(colorFormat: ColorFormat): Map<String, String> {
-    val base = mapOf(
-        "primary" to colorFormat.formatter(primary),
-        "onPrimary" to colorFormat.formatter(onPrimary),
-        "primaryContainer" to colorFormat.formatter(primaryContainer),
-        "onPrimaryContainer" to colorFormat.formatter(onPrimaryContainer),
-        "inversePrimary" to colorFormat.formatter(inversePrimary),
-        "secondary" to colorFormat.formatter(secondary),
-        "onSecondary" to colorFormat.formatter(onSecondary),
-        "secondaryContainer" to colorFormat.formatter(secondaryContainer),
-        "onSecondaryContainer" to colorFormat.formatter(onSecondaryContainer),
-        "tertiary" to colorFormat.formatter(tertiary),
-        "onTertiary" to colorFormat.formatter(onTertiary),
-        "tertiaryContainer" to colorFormat.formatter(tertiaryContainer),
-        "onTertiaryContainer" to colorFormat.formatter(onTertiaryContainer),
-        "background" to colorFormat.formatter(background),
-        "onBackground" to colorFormat.formatter(onBackground),
-        "surface" to colorFormat.formatter(surface),
-        "onSurface" to colorFormat.formatter(onSurface),
-        "surfaceVariant" to colorFormat.formatter(surfaceVariant),
-        "onSurfaceVariant" to colorFormat.formatter(onSurfaceVariant),
-        "surfaceTint" to colorFormat.formatter(surfaceTint),
-        "inverseSurface" to colorFormat.formatter(inverseSurface),
-        "inverseOnSurface" to colorFormat.formatter(inverseOnSurface),
-        "error" to colorFormat.formatter(error),
-        "onError" to colorFormat.formatter(onError),
-        "errorContainer" to colorFormat.formatter(errorContainer),
-        "onErrorContainer" to colorFormat.formatter(onErrorContainer),
-        "outline" to colorFormat.formatter(outline),
-        "outlineVariant" to colorFormat.formatter(outlineVariant),
-        "scrim" to colorFormat.formatter(scrim),
-        "surfaceBright" to colorFormat.formatter(surfaceBright),
-        "surfaceContainer" to colorFormat.formatter(surfaceContainer),
-        "surfaceContainerHigh" to colorFormat.formatter(surfaceContainerHigh),
-        "surfaceContainerHighest" to colorFormat.formatter(surfaceContainerHighest),
-        "surfaceContainerLow" to colorFormat.formatter(surfaceContainerLow),
-        "surfaceContainerLowest" to colorFormat.formatter(surfaceContainerLowest),
-        "surfaceDim" to colorFormat.formatter(surfaceDim),
-        "primaryFixed" to colorFormat.formatter(primaryFixed),
-        "primaryFixedDim" to colorFormat.formatter(primaryFixedDim),
-        "onPrimaryFixed" to colorFormat.formatter(onPrimaryFixed),
-        "onPrimaryFixedVariant" to colorFormat.formatter(onPrimaryFixedVariant),
-        "secondaryFixed" to colorFormat.formatter(secondaryFixed),
-        "secondaryFixedDim" to colorFormat.formatter(secondaryFixedDim),
-        "onSecondaryFixed" to colorFormat.formatter(onSecondaryFixed),
-        "onSecondaryFixedVariant" to colorFormat.formatter(onSecondaryFixedVariant),
-        "tertiaryFixed" to colorFormat.formatter(tertiaryFixed),
-        "tertiaryFixedDim" to colorFormat.formatter(tertiaryFixedDim),
-        "onTertiaryFixed" to colorFormat.formatter(onTertiaryFixed),
-        "onTertiaryFixedVariant" to colorFormat.formatter(onTertiaryFixedVariant),
+data class FormattedColor(
+    val colorName: String,
+    val color: Color,
+    val output: String,
+    val enabled: Boolean = true
+)
+
+fun ColorScheme.toFormattedColors(colorFormat: ColorFormat): List<FormattedColor> {
+    val base = listOf(
+        FormattedColor(
+            colorName = "primary",
+            color = primary,
+            output = colorFormat.formatter(primary)
+        ),
+        FormattedColor(
+            colorName = "onPrimary",
+            color = onPrimary,
+            output = colorFormat.formatter(onPrimary)
+        ),
+        FormattedColor(
+            colorName = "primaryContainer",
+            color = primaryContainer,
+            output = colorFormat.formatter(primaryContainer)
+        ),
+        FormattedColor(
+            colorName = "onPrimaryContainer",
+            color = onPrimaryContainer,
+            output = colorFormat.formatter(onPrimaryContainer)
+        ),
+        FormattedColor(
+            colorName = "inversePrimary",
+            color = inversePrimary,
+            output = colorFormat.formatter(inversePrimary)
+        ),
+        FormattedColor(
+            colorName = "secondary",
+            color = secondary,
+            output = colorFormat.formatter(secondary)
+        ),
+        FormattedColor(
+            colorName = "onSecondary",
+            color = onSecondary,
+            output = colorFormat.formatter(onSecondary)
+        ),
+        FormattedColor(
+            colorName = "secondaryContainer",
+            color = secondaryContainer,
+            output = colorFormat.formatter(secondaryContainer)
+        ),
+        FormattedColor(
+            colorName = "onSecondaryContainer",
+            color = onSecondaryContainer,
+            output = colorFormat.formatter(onSecondaryContainer)
+        ),
+        FormattedColor(
+            colorName = "tertiary",
+            color = tertiary,
+            output = colorFormat.formatter(tertiary)
+        ),
+        FormattedColor(
+            colorName = "onTertiary",
+            color = onTertiary,
+            output = colorFormat.formatter(onTertiary)
+        ),
+        FormattedColor(
+            colorName = "tertiaryContainer",
+            color = tertiaryContainer,
+            output = colorFormat.formatter(tertiaryContainer)
+        ),
+        FormattedColor(
+            colorName = "onTertiaryContainer",
+            color = onTertiaryContainer,
+            output = colorFormat.formatter(onTertiaryContainer)
+        ),
+        FormattedColor(
+            colorName = "background",
+            color = background,
+            output = colorFormat.formatter(background)
+        ),
+        FormattedColor(
+            colorName = "onBackground",
+            color = onBackground,
+            output = colorFormat.formatter(onBackground)
+        ),
+        FormattedColor(
+            colorName = "surface",
+            color = surface,
+            output = colorFormat.formatter(surface)
+        ),
+        FormattedColor(
+            colorName = "onSurface",
+            color = onSurface,
+            output = colorFormat.formatter(onSurface)
+        ),
+        FormattedColor(
+            colorName = "surfaceVariant",
+            color = surfaceVariant,
+            output = colorFormat.formatter(surfaceVariant)
+        ),
+        FormattedColor(
+            colorName = "onSurfaceVariant",
+            color = onSurfaceVariant,
+            output = colorFormat.formatter(onSurfaceVariant)
+        ),
+        FormattedColor(
+            colorName = "surfaceTint",
+            color = surfaceTint,
+            output = colorFormat.formatter(surfaceTint)
+        ),
+        FormattedColor(
+            colorName = "inverseSurface",
+            color = inverseSurface,
+            output = colorFormat.formatter(inverseSurface)
+        ),
+        FormattedColor(
+            colorName = "inverseOnSurface",
+            color = inverseOnSurface,
+            output = colorFormat.formatter(inverseOnSurface)
+        ),
+        FormattedColor(
+            colorName = "error",
+            color = error,
+            output = colorFormat.formatter(error)
+        ),
+        FormattedColor(
+            colorName = "onError",
+            color = onError,
+            output = colorFormat.formatter(onError)
+        ),
+        FormattedColor(
+            colorName = "errorContainer",
+            color = errorContainer,
+            output = colorFormat.formatter(errorContainer)
+        ),
+        FormattedColor(
+            colorName = "onErrorContainer",
+            color = onErrorContainer,
+            output = colorFormat.formatter(onErrorContainer)
+        ),
+        FormattedColor(
+            colorName = "outline",
+            color = outline,
+            output = colorFormat.formatter(outline)
+        ),
+        FormattedColor(
+            colorName = "outlineVariant",
+            color = outlineVariant,
+            output = colorFormat.formatter(outlineVariant)
+        ),
+        FormattedColor(
+            colorName = "scrim",
+            color = scrim,
+            output = colorFormat.formatter(scrim)
+        ),
+        FormattedColor(
+            colorName = "surfaceBright",
+            color = surfaceBright,
+            output = colorFormat.formatter(surfaceBright)
+        ),
+        FormattedColor(
+            colorName = "surfaceContainer",
+            color = surfaceContainer,
+            output = colorFormat.formatter(surfaceContainer)
+        ),
+        FormattedColor(
+            colorName = "surfaceContainerHigh",
+            color = surfaceContainerHigh,
+            output = colorFormat.formatter(surfaceContainerHigh)
+        ),
+        FormattedColor(
+            colorName = "surfaceContainerHighest",
+            color = surfaceContainerHighest,
+            output = colorFormat.formatter(surfaceContainerHighest)
+        ),
+        FormattedColor(
+            colorName = "surfaceContainerLow",
+            color = surfaceContainerLow,
+            output = colorFormat.formatter(surfaceContainerLow)
+        ),
+        FormattedColor(
+            colorName = "surfaceContainerLowest",
+            color = surfaceContainerLowest,
+            output = colorFormat.formatter(surfaceContainerLowest)
+        ),
+        FormattedColor(
+            colorName = "surfaceDim",
+            color = surfaceDim,
+            output = colorFormat.formatter(surfaceDim)
+        ),
+        FormattedColor(
+            colorName = "primaryFixed",
+            color = primaryFixed,
+            output = colorFormat.formatter(primaryFixed)
+        ),
+        FormattedColor(
+            colorName = "primaryFixedDim",
+            color = primaryFixedDim,
+            output = colorFormat.formatter(primaryFixedDim)
+        ),
+        FormattedColor(
+            colorName = "onPrimaryFixed",
+            color = onPrimaryFixed,
+            output = colorFormat.formatter(onPrimaryFixed)
+        ),
+        FormattedColor(
+            colorName = "onPrimaryFixedVariant",
+            color = onPrimaryFixedVariant,
+            output = colorFormat.formatter(onPrimaryFixedVariant)
+        ),
+        FormattedColor(
+            colorName = "secondaryFixed",
+            color = secondaryFixed,
+            output = colorFormat.formatter(secondaryFixed)
+        ),
+        FormattedColor(
+            colorName = "secondaryFixedDim",
+            color = secondaryFixedDim,
+            output = colorFormat.formatter(secondaryFixedDim)
+        ),
+        FormattedColor(
+            colorName = "onSecondaryFixed",
+            color = onSecondaryFixed,
+            output = colorFormat.formatter(onSecondaryFixed)
+        ),
+        FormattedColor(
+            colorName = "onSecondaryFixedVariant",
+            color = onSecondaryFixedVariant,
+            output = colorFormat.formatter(onSecondaryFixedVariant)
+        ),
+        FormattedColor(
+            colorName = "tertiaryFixed",
+            color = tertiaryFixed,
+            output = colorFormat.formatter(tertiaryFixed)
+        ),
+        FormattedColor(
+            colorName = "tertiaryFixedDim",
+            color = tertiaryFixedDim,
+            output = colorFormat.formatter(tertiaryFixedDim)
+        ),
+        FormattedColor(
+            colorName = "onTertiaryFixed",
+            color = onTertiaryFixed,
+            output = colorFormat.formatter(onTertiaryFixed)
+        ),
+        FormattedColor(
+            colorName = "onTertiaryFixedVariant",
+            color = onTertiaryFixedVariant,
+            output = colorFormat.formatter(onTertiaryFixedVariant)
+        ),
     )
 
     val elevatedSurfaceLevels = getElevatedSurfaceLevels()
-    val extraSurfaceValues = mapOf(
-        "// surfaceLevel1" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel1),
-        "// surfaceLevel2" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel2),
-        "// surfaceLevel3" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel3),
-        "// surfaceLevel4" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel4),
-        "// surfaceLevel5" to colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel5),
+    val extraSurfaceValues = listOf(
+        FormattedColor(
+            colorName = "surfaceLevel1",
+            color = elevatedSurfaceLevels.surfaceLevel1,
+            output = colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel1),
+            enabled = false
+        ),
+        FormattedColor(
+            colorName = "surfaceLevel2",
+            color = elevatedSurfaceLevels.surfaceLevel2,
+            output = colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel2),
+            enabled = false
+        ),
+        FormattedColor(
+            colorName = "surfaceLevel3",
+            color = elevatedSurfaceLevels.surfaceLevel3,
+            output = colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel3),
+            enabled = false
+        ),
+        FormattedColor(
+            colorName = "surfaceLevel4",
+            color = elevatedSurfaceLevels.surfaceLevel4,
+            output = colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel4),
+            enabled = false
+        ),
+        FormattedColor(
+            colorName = "surfaceLevel5",
+            color = elevatedSurfaceLevels.surfaceLevel5,
+            output = colorFormat.formatter(elevatedSurfaceLevels.surfaceLevel5),
+            enabled = false
+        ),
     )
 
     return base + extraSurfaceValues

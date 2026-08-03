@@ -61,7 +61,11 @@ fun MainScreen(
             // Screen content
             when (currentScreenIndex) {
                 0 -> PreviewGridScreen()
-                1 -> ExportScreen(themeColorPack = themeColorPack)
+                1 -> ExportScreen(
+                    themeColorPack = themeColorPack,
+                    isDarkTheme = isDarkTheme,
+                )
+
                 else -> Text("Unknown")
             }
         }
