@@ -1,5 +1,6 @@
 package com.spundev.dynamicthemeexport.data
 
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -75,8 +76,10 @@ data class ThemeColorPack(
                 withStyle(SpanStyle(color = colors.functionName)) { appendLine("= $schemeFunction(") }
                 colorScheme.toFormattedColors(colorFormat).forEach { formattedColor ->
                     val colorName = formattedColor.colorName
+                    val colorValue = formattedColor.color
                     val colorOutput = formattedColor.output
                     val isEnabled = formattedColor.enabled
+                    withStyle(SpanStyle(colorValue)) { appendInlineContent("swatch", "▌") }
                     if (isEnabled) {
                         withStyle(SpanStyle(color = colors.parameterName)) { append("   $colorName = ") }
                         withStyle(SpanStyle(color = colors.functionName)) { append("Color(") }
