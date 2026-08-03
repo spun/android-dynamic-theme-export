@@ -2,10 +2,10 @@ package com.spundev.dynamicthemeexport.ui.export
 
 import android.content.ClipData
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -265,16 +266,16 @@ private fun ExportCodeViewer(
             .padding(contentPadding)
             .windowInsetsPadding(windowInsets.only(WindowInsetsSides.Bottom))
             .clip(codeViewerShape.shape)
-            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .border(1.dp, MaterialTheme.colorScheme.secondaryContainer, codeViewerShape.shape)
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
             .freeScroll(rememberFreeScrollState())
     ) {
         SelectionContainer {
             Text(
                 text = codeText,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    fontFamily = FontFamily(Typeface.MONOSPACE)
-                ),
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(
                     start = 8.dp,
                     top = 8.dp,
