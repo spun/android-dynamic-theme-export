@@ -1,5 +1,5 @@
 [versions]
-agp = "9.4.0-alpha07"
+agp = "9.3.1"
 androidxActivity = "1.13.0"
 androidxComposeBom = "2026.06.01"
 androidxEspresso = "3.7.0"
