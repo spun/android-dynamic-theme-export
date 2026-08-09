@@ -29,13 +29,13 @@ fun ColorBlockBasic(
         modifier = modifier
             .height(style.bigCellHeight)
             .background(color)
-            .combinedClickable(
+            /*.combinedClickable(
                 onClick = { },
                 onLongClick = {
                     val colorString = ColorBlockCopyFormatter(color)
                     onCopy("$text: $colorString")
                 }
-            )
+            )*/
             .padding(style.contentPadding)
     ) {
         Text(

@@ -5,9 +5,6 @@ package com.spundev.dynamicthemeexport.ui.preview
 import android.content.ClipData
 import android.os.Build
 import android.widget.Toast
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,35 +15,30 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastAny
 import com.spundev.dynamicthemeexport.data.ElevatedSurfaceLevels
 import com.spundev.dynamicthemeexport.ext.getElevatedSurfaceLevels
 import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockBasic
@@ -55,8 +47,6 @@ import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockWithFixedA
 import com.spundev.dynamicthemeexport.ui.preview.components.DefaultColorBlockStyle
 import com.spundev.dynamicthemeexport.ui.preview.components.ForceSmallColorBlockStyle
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
-import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
-import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -66,9 +56,6 @@ fun PreviewGridScreen() {
     val elevatedSurfaceLevels = remember(currentColorScheme) {
         currentColorScheme.getElevatedSurfaceLevels()
     }
-
-    var zoom: Float by remember { mutableFloatStateOf(1f) }
-    val freeScrollState = rememberFreeScrollState()
 
     // Copy to clipboard
     val context = LocalContext.current
@@ -91,70 +78,49 @@ fun PreviewGridScreen() {
         WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
     )
 
-    Grid(
-        config = {
-            // Split
-            repeat(2) { column(GridTrackSize.MinContent) }
-            repeat(5) { row(GridTrackSize.MinContent) }
-            gap(ColorTableSectionPadding)
-        },
-        modifier = Modifier
-            .fillMaxSize()
-            .freeScroll(freeScrollState)
-            .pointerInput(Unit) {
-                // NOTE: We need to do this instead of using detectGestures because detectGestures
-                // has a few checks triggered by the combinedClickable in our color blocks
-                // (copy-to-clipboard feature) that break the while loop.
-                // This is a simplified version that only calculates zoom changes.
-                awaitEachGesture {
-                    awaitFirstDown(requireUnconsumed = false)
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        val isConsumed = event.changes.fastAny { it.isConsumed }
-                        if (event.changes.size > 1 && !isConsumed) {
-                            val zoomChange = event.calculateZoom()
-                            zoom = (zoom * zoomChange).coerceIn(0.5f, 1f)
-                            event.changes.forEach { it.consume() }
-                        }
-                    }
-                }
-            }
-            .graphicsLayer {
-                scaleX = zoom
-                scaleY = zoom
-            }
-            .windowInsetsPadding(gridInsets)
-            .padding(16.dp)
-    ) {
-        PrimarySecondaryTertiarySection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 1, column = 1)
-        )
-        ErrorsSection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 1, column = 2)
-        )
-        FixedPrimarySecondaryTertiarySection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 2, column = 1)
-        )
-        SurfacesSection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 3, column = 1)
-        )
-        InverseSection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 3, column = 2)
-        )
-        DeprecatedSection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 4, column = 1)
-        )
-        LegacyElevatedSurfacesSection(
-            colors = elevatedSurfaceLevels,
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 5, column = 1)
-        )
+    PanZoomViewer {
+        Grid(
+            config = {
+                // Split
+                repeat(2) { column(GridTrackSize.MinContent) }
+                repeat(5) { row(GridTrackSize.MinContent) }
+                gap(ColorTableSectionPadding)
+            },
+            modifier = Modifier
+                .wrapContentSize(align = Alignment.TopStart, unbounded = true)
+                .windowInsetsPadding(gridInsets)
+                .padding(16.dp)
+        ) {
+            PrimarySecondaryTertiarySection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(row = 1, column = 1)
+            )
+            ErrorsSection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(row = 1, column = 2)
+            )
+            FixedPrimarySecondaryTertiarySection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(row = 2, column = 1)
+            )
+            SurfacesSection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(row = 3, column = 1)
+            )
+            InverseSection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(row = 3, column = 2)
+            )
+            DeprecatedSection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(row = 4, column = 1)
+            )
+            LegacyElevatedSurfacesSection(
+                colors = elevatedSurfaceLevels,
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(row = 5, column = 1)
+            )
+        }
     }
 }
 

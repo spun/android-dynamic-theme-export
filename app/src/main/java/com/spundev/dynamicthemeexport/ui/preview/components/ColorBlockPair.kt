@@ -33,7 +33,7 @@ fun ColorBlockPair(
 
     Column(
         modifier = modifier
-            .combinedClickable(
+            /*.combinedClickable(
                 onClick = { },
                 onLongClick = {
                     val formatter = ColorBlockCopyFormatter
@@ -42,7 +42,7 @@ fun ColorBlockPair(
                         appendLine("$onText: ${formatter(onColor)}")
                     }.let(onCopy)
                 }
-            )
+            )*/
     ) {
         Box(
             contentAlignment = Alignment.TopStart,

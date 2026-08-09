@@ -39,7 +39,7 @@ fun ColorBlockWithFixedAccent(
     style: ColorBlockStyle = DefaultColorBlockStyle
 ) {
     Column(modifier = modifier
-        .combinedClickable(
+        /*.combinedClickable(
             onClick = { },
             onLongClick = {
                 val formatter = ColorBlockCopyFormatter
@@ -50,7 +50,7 @@ fun ColorBlockWithFixedAccent(
                     appendLine("$onFixedVariantText: ${formatter(onFixedVariantColor)}")
                 }.let(onCopy)
             }
-        )
+        )*/
     ) {
         Row(
             modifier = Modifier
