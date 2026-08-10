@@ -87,7 +87,6 @@ fun PreviewGridScreen() {
                 gap(ColorTableSectionPadding)
             },
             modifier = Modifier
-                .wrapContentSize(align = Alignment.TopStart, unbounded = true)
                 .windowInsetsPadding(gridInsets)
                 .padding(16.dp)
         ) {
