@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,7 +29,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboard
@@ -47,6 +45,7 @@ import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockWithFixedA
 import com.spundev.dynamicthemeexport.ui.preview.components.DefaultColorBlockStyle
 import com.spundev.dynamicthemeexport.ui.preview.components.ForceSmallColorBlockStyle
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
+import com.spundev.dynamicthemeexport.util.panZoomViewer.PanZoomViewer
 import kotlinx.coroutines.launch
 
 @Composable

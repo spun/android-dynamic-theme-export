@@ -1,4 +1,4 @@
-package com.spundev.dynamicthemeexport.ui.preview
+package com.spundev.dynamicthemeexport.util.panZoomViewer
 
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
@@ -97,6 +97,17 @@ fun PanZoomViewer(
         )
     }
 
+    // Alt to maxOffset that uses the newScale value instead of the real one
+    // TODO: merge both
+    fun maxOffset(newScale: Float): Offset {
+        val overflowX = size.width * newScale - viewportSize.width
+        val overflowY = size.height * newScale - viewportSize.height
+        return Offset(
+            x = if (overflowX <= 0f) 0f else overflowX / newScale,
+            y = if (overflowY <= 0f) 0f else overflowY / newScale
+        )
+    }
+
     val scrollable2DState = rememberScrollable2DState {
         // Don't fight the zoom animation for control of offset
         zoomAnimationJob?.cancel()
@@ -166,8 +177,21 @@ fun PanZoomViewer(
                         val initialOffset = offset
                         // Since tapOffset is the position of the viewport that receives the double
                         // tap, we calculate what part of the content was behind tapOffset.
-                        val contentPoint = initialOffset + tapOffset / initialScale
+                        val contentPoint = initialOffset + (tapOffset / initialScale)
+
+                        // We want to center the tapped area while we zoom in/out but that might put
+                        // us past the content boundaries. Calculate the final position we want and
+                        // then pull it back to a "legal" position.
                         val viewportCenter = viewportSize.center.toOffset()
+                        val desiredTargetOffset = contentPoint - (viewportCenter / newScale)
+                        val targetOffset = desiredTargetOffset.coerceIn(
+                            lower = Offset.Zero,
+                            upper = maxOffset(newScale)
+                        )
+
+                        // Since we may not end exactly on center, calculate where contentPoint will
+                        // actually be on screen at the end of the animation.
+                        val finalScreenPos = (contentPoint - targetOffset) * newScale
 
                         // Cancel any previous zoom animation before starting a new one
                         zoomAnimationJob?.cancel()
@@ -178,20 +202,24 @@ fun PanZoomViewer(
                                 animationSpec = tween(10000)//SpringSpec(stiffness = Spring.StiffnessLow)
                             ) { value, /* velocity */ _ ->
                                 val currentScale = lerp(initialScale, newScale, value)
+                                // Move the tapped point from where the user tapped to its final
+                                // spot.
                                 // We don't lerp offset directly, that makes the tapped point drift
                                 // in an arc since offset and scale would change linearly but
                                 // independently. Instead, we calculate where contentPoint should be
                                 // on screen at this point of the animation.
                                 val screenPos = androidx.compose.ui.geometry.lerp(
                                     tapOffset,
-                                    viewportCenter,
+                                    finalScreenPos,
                                     value
                                 )
-                                // Get offset so contentPoint lands exactly at screenPos
+                                // We know where we want the tapped point to appear on screen at
+                                // this point of the animation, and how zoomed in we are.
+                                // Work backwards to find the offset.
                                 val currentOffset = contentPoint - screenPos / currentScale
                                 // Apply values
                                 scale = currentScale
-                                offset = currentOffset.coerceIn(Offset.Zero, maxOffset())
+                                offset = currentOffset
                             }
                         }
                     }
@@ -213,12 +241,12 @@ fun PanZoomViewer(
                 }
         )
         // TODO: Remove. Viewport center
-        //        Spacer(
-        //            Modifier
-        //                .size(12.dp)
-        //                .background(Color.Red)
-        //                .align(Alignment.Center)
-        //        )
+        //  Spacer(
+        //      Modifier
+        //          .size(12.dp)
+        //          .background(Color.Red)
+        //          .align(Alignment.Center)
+        //  )
     }
 }
 
