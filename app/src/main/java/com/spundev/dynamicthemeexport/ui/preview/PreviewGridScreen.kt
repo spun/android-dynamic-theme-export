@@ -45,7 +45,8 @@ import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockWithFixedA
 import com.spundev.dynamicthemeexport.ui.preview.components.DefaultColorBlockStyle
 import com.spundev.dynamicthemeexport.ui.preview.components.ForceSmallColorBlockStyle
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
-import com.spundev.dynamicthemeexport.util.panZoomViewer.PanZoomViewer
+import com.spundev.dynamicthemeexport.util.panZoom.panZoom
+import com.spundev.dynamicthemeexport.util.panZoom.rememberPanZoomState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -77,48 +78,47 @@ fun PreviewGridScreen() {
         WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
     )
 
-    PanZoomViewer {
-        Grid(
-            config = {
-                // Split
-                repeat(2) { column(GridTrackSize.MinContent) }
-                repeat(5) { row(GridTrackSize.MinContent) }
-                gap(ColorTableSectionPadding)
-            },
-            modifier = Modifier
-                .windowInsetsPadding(gridInsets)
-                .padding(16.dp)
-        ) {
-            PrimarySecondaryTertiarySection(
-                onCopy = { scope.launch { onCopy(it) } },
-                modifier = Modifier.gridItem(row = 1, column = 1)
-            )
-            ErrorsSection(
-                onCopy = { scope.launch { onCopy(it) } },
-                modifier = Modifier.gridItem(row = 1, column = 2)
-            )
-            FixedPrimarySecondaryTertiarySection(
-                onCopy = { scope.launch { onCopy(it) } },
-                modifier = Modifier.gridItem(row = 2, column = 1)
-            )
-            SurfacesSection(
-                onCopy = { scope.launch { onCopy(it) } },
-                modifier = Modifier.gridItem(row = 3, column = 1)
-            )
-            InverseSection(
-                onCopy = { scope.launch { onCopy(it) } },
-                modifier = Modifier.gridItem(row = 3, column = 2)
-            )
-            DeprecatedSection(
-                onCopy = { scope.launch { onCopy(it) } },
-                modifier = Modifier.gridItem(row = 4, column = 1)
-            )
-            LegacyElevatedSurfacesSection(
-                colors = elevatedSurfaceLevels,
-                onCopy = { scope.launch { onCopy(it) } },
-                modifier = Modifier.gridItem(row = 5, column = 1)
-            )
-        }
+    Grid(
+        config = {
+            // Split
+            repeat(2) { column(GridTrackSize.MinContent) }
+            repeat(5) { row(GridTrackSize.MinContent) }
+            gap(ColorTableSectionPadding)
+        },
+        modifier = Modifier
+            .panZoom(rememberPanZoomState())
+            .windowInsetsPadding(gridInsets)
+            .padding(16.dp)
+    ) {
+        PrimarySecondaryTertiarySection(
+            onCopy = { scope.launch { onCopy(it) } },
+            modifier = Modifier.gridItem(row = 1, column = 1)
+        )
+        ErrorsSection(
+            onCopy = { scope.launch { onCopy(it) } },
+            modifier = Modifier.gridItem(row = 1, column = 2)
+        )
+        FixedPrimarySecondaryTertiarySection(
+            onCopy = { scope.launch { onCopy(it) } },
+            modifier = Modifier.gridItem(row = 2, column = 1)
+        )
+        SurfacesSection(
+            onCopy = { scope.launch { onCopy(it) } },
+            modifier = Modifier.gridItem(row = 3, column = 1)
+        )
+        InverseSection(
+            onCopy = { scope.launch { onCopy(it) } },
+            modifier = Modifier.gridItem(row = 3, column = 2)
+        )
+        DeprecatedSection(
+            onCopy = { scope.launch { onCopy(it) } },
+            modifier = Modifier.gridItem(row = 4, column = 1)
+        )
+        LegacyElevatedSurfacesSection(
+            colors = elevatedSurfaceLevels,
+            onCopy = { scope.launch { onCopy(it) } },
+            modifier = Modifier.gridItem(row = 5, column = 1)
+        )
     }
 }
 
