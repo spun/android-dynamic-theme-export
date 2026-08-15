@@ -20,7 +20,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.center
 import androidx.compose.ui.unit.toOffset
-import androidx.compose.ui.util.lerp
 import kotlin.math.max
 
 /**
@@ -180,22 +179,34 @@ class PanZoomState(
         val finalScreenPos = (contentPoint - targetOffset) * newScale
 
         // Start animation.
+        // We animate scale directly (rather than a 0..1 progress we can use to lerp the scale and
+        // offset) because we noticed some "jank" at the end with some spring animationSpec.
+        //
+        // As far as we know, a spring animation behaves like a real spring. A spring stretches less
+        // and less as it nears its resting position and, in theory, it never exactly reaches the
+        // target. Compose makes a judgment call and stops when the animation is "close enough",
+        // then snaps to the target value.
+        //
+        // If we animate a "progress" from 0 to 1, the "close enough" happens by default once it's
+        // within 0.01 of 1 in this case. If we multiply this progress through lerp by the distance
+        // between initialScale and newScale, a zoom animation from 1 to 4, would transform that
+        // 0.01 "close enough" jump into a 0.03 one, and the bigger the zoom range, the bigger that
+        // final jump.
+        //
+        // If instead of animating a progress we animate the scale directly, we won't see that
+        // unexpected jump we got at the end of the animation when scale was derived from progress.
         animate(
-            initialValue = 0f,
-            targetValue = 1f,
+            initialValue = initialScale,
+            targetValue = newScale,
             animationSpec = animationSpec
-        ) { value, /* velocity */ _ ->
-            val currentScale = lerp(initialScale, newScale, value)
-            // Move the tapped point from where the user tapped to its final
-            // spot.
-            // We don't lerp offset directly, that makes the tapped point drift
-            // in an arc since offset and scale would change linearly but
-            // independently. Instead, we calculate where contentPoint should be
-            // on screen at this point of the animation.
+        ) { currentScale, /* velocity */ _ ->
+            // Recover a 0..1 progress position from the scale itself so "screenPos" follows the
+            // scale animation.
+            val progress = (currentScale - initialScale) / (newScale - initialScale)
             val screenPos = androidx.compose.ui.geometry.lerp(
                 centroid,
                 finalScreenPos,
-                value
+                progress
             )
             // We know where we want the tapped point to appear on screen at
             // this point of the animation, and how zoomed in we are.
