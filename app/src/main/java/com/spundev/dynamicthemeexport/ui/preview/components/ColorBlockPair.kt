@@ -2,7 +2,6 @@ package com.spundev.dynamicthemeexport.ui.preview.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.spundev.dynamicthemeexport.util.transparentLongClick
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -33,16 +33,13 @@ fun ColorBlockPair(
 
     Column(
         modifier = modifier
-            .combinedClickable(
-                onClick = { },
-                onLongClick = {
-                    val formatter = ColorBlockCopyFormatter
-                    buildString {
-                        appendLine("$text: ${formatter(color)}")
-                        appendLine("$onText: ${formatter(onColor)}")
-                    }.let(onCopy)
-                }
-            )
+            .transparentLongClick {
+                val formatter = ColorBlockCopyFormatter
+                buildString {
+                    appendLine("$text: ${formatter(color)}")
+                    appendLine("$onText: ${formatter(onColor)}")
+                }.let(onCopy)
+            }
     ) {
         Box(
             contentAlignment = Alignment.TopStart,
