@@ -27,15 +27,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.spundev.dynamicthemeexport.data.ElevatedSurfaceLevels
 import com.spundev.dynamicthemeexport.ext.getElevatedSurfaceLevels
@@ -78,55 +81,68 @@ fun PreviewGridScreen() {
         WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
     )
 
-    Grid(
-        config = {
-            // 1. Define tracks
-            repeat(2) { column(GridTrackSize.MinContent) }
-            repeat(5) { row(GridTrackSize.MinContent) }
-            gap(ColorTableSectionPadding)
-            // 2. Map Semantic Strings to coordinates
-            area("primarySecondaryTertiary", row = 1, column = 1)
-            area("errors", row = 1, column = 2)
-            area("fixedPrimarySecondaryTertiary", row = 2, column = 1)
-            area("surfaces", row = 3, column = 1)
-            area("inverse", row = 3, column = 2)
-            area("deprecated", row = 4, column = 1)
-            area("legacyElevatedSurfaces", row = 5, column = 1)
-        },
-        modifier = Modifier
-            .panZoom(rememberPanZoomState())
-            .windowInsetsPadding(gridInsets)
-            .padding(16.dp)
-    ) {
-        PrimarySecondaryTertiarySection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(areaId = "primarySecondaryTertiary")
-        )
-        ErrorsSection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(areaId = "errors")
-        )
-        FixedPrimarySecondaryTertiarySection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(areaId = "fixedPrimarySecondaryTertiary")
-        )
-        SurfacesSection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(areaId = "surfaces")
-        )
-        InverseSection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(areaId = "inverse")
-        )
-        DeprecatedSection(
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(areaId = "deprecated")
-        )
-        LegacyElevatedSurfacesSection(
-            colors = elevatedSurfaceLevels,
-            onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(areaId = "legacyElevatedSurfaces")
-        )
+    // Lock font scale
+    // Increased fontScale values can break the layout of the table. Since our table can be
+    // zoomed-in without a limit, the font scaling is not that necessary here. We are locking the
+    // fontScale to 1f just for this area until we find a better solution.
+    val currentDensity = LocalDensity.current
+    val fixedDensity = Density(
+        // keep pixel density
+        density = currentDensity.density,
+        // ignore system font scale
+        fontScale = 1f
+    )
+    CompositionLocalProvider(LocalDensity provides fixedDensity) {
+        Grid(
+            config = {
+                // 1. Define tracks
+                repeat(2) { column(GridTrackSize.MinContent) }
+                repeat(5) { row(GridTrackSize.MinContent) }
+                gap(ColorTableSectionPadding)
+                // 2. Map Semantic Strings to coordinates
+                area("primarySecondaryTertiary", row = 1, column = 1)
+                area("errors", row = 1, column = 2)
+                area("fixedPrimarySecondaryTertiary", row = 2, column = 1)
+                area("surfaces", row = 3, column = 1)
+                area("inverse", row = 3, column = 2)
+                area("deprecated", row = 4, column = 1)
+                area("legacyElevatedSurfaces", row = 5, column = 1)
+            },
+            modifier = Modifier
+                .panZoom(rememberPanZoomState())
+                .windowInsetsPadding(gridInsets)
+                .padding(16.dp)
+        ) {
+            PrimarySecondaryTertiarySection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(areaId = "primarySecondaryTertiary")
+            )
+            ErrorsSection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(areaId = "errors")
+            )
+            FixedPrimarySecondaryTertiarySection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(areaId = "fixedPrimarySecondaryTertiary")
+            )
+            SurfacesSection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(areaId = "surfaces")
+            )
+            InverseSection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(areaId = "inverse")
+            )
+            DeprecatedSection(
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(areaId = "deprecated")
+            )
+            LegacyElevatedSurfacesSection(
+                colors = elevatedSurfaceLevels,
+                onCopy = { scope.launch { onCopy(it) } },
+                modifier = Modifier.gridItem(areaId = "legacyElevatedSurfaces")
+            )
+        }
     }
 }
 
