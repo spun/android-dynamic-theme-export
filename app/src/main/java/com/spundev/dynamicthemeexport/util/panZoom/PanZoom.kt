@@ -10,19 +10,13 @@ import androidx.compose.foundation.gestures.scrollable2D
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.SuspendingPointerInputModifierNode
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.DelegatingNode
-import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAny
+import com.spundev.dynamicthemeexport.util.PanLayoutElement
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -38,7 +32,7 @@ fun Modifier.panZoom(state: PanZoomState): Modifier = this
     )
     // Split gestures from layout so the gestures are not only read when done on top of the content.
     .then(PanZoomGestureElement(state))
-    .then(PanZoomLayoutElement(state))
+    .then(PanLayoutElement(state))
 
 /**
  * Element wrapper for [PanZoomGestureNode].
@@ -122,55 +116,6 @@ private class PanZoomGestureNode(
         state.onGestureInterrupt = null // "detach" from the old state
         state = newState
         state.onGestureInterrupt = { scaleAnimationJob?.cancel() } // "attach" to the new one
-    }
-}
-
-/**
- * Element wrapper for [PanZoomLayoutNode].
- */
-private data class PanZoomLayoutElement(
-    val state: PanZoomState
-) : ModifierNodeElement<PanZoomLayoutNode>() {
-
-    override fun create(): PanZoomLayoutNode = PanZoomLayoutNode(state)
-
-    override fun update(node: PanZoomLayoutNode) {
-        node.state = state
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        name = "panZoomLayout"
-        properties["state"] = state
-    }
-}
-
-/**
- * Measure content unconstrained, report sizes and applies pan and zoom changes.
- */
-private class PanZoomLayoutNode(
-    var state: PanZoomState
-) : Modifier.Node(), LayoutModifierNode {
-
-    override fun MeasureScope.measure(
-        measurable: Measurable,
-        constraints: Constraints
-    ): MeasureResult {
-        // Measure content unconstrained
-        val placeable = measurable.measure(Constraints())
-        state.updateSizes(
-            viewport = IntSize(constraints.maxWidth, constraints.maxHeight),
-            content = IntSize(placeable.width, placeable.height)
-        )
-        return layout(constraints.maxWidth, constraints.maxHeight) {
-            // Apply pan and zoom values.
-            placeable.placeRelativeWithLayer(0, 0) {
-                translationX = -state.offset.x * state.scale
-                translationY = -state.offset.y * state.scale
-                scaleX = state.scale
-                scaleY = state.scale
-                transformOrigin = TransformOrigin(0f, 0f)
-            }
-        }
     }
 }
 
