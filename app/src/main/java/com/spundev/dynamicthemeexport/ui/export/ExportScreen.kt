@@ -130,12 +130,15 @@ private fun ExportScreenContent(
     windowInsets: WindowInsets = WindowInsets.safeDrawing,
 ) {
     val contentPadding = 8.dp
+    val horizontalInsets = windowInsets.only(WindowInsetsSides.Horizontal)
     Column(
-        modifier = Modifier.padding(
-            top = contentPadding,
-            start = contentPadding,
-            end = contentPadding,
-        )
+        modifier = Modifier
+            .windowInsetsPadding(horizontalInsets)
+            .padding(
+                top = contentPadding,
+                start = contentPadding,
+                end = contentPadding,
+            )
     ) {
         ExportOptionsBar(
             colorFormat = colorFormat,
