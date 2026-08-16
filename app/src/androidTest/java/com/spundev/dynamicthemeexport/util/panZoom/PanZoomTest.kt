@@ -201,7 +201,7 @@ class PanZoomModifierTest {
         composeRule.runOnIdle {
             // At scale 1f max offset per axis should be 100.dp but, viewport and content sizes are
             // rounded to Int px when measured. We cannot assume that difference between both is
-            // 100.px, we need to calculate it the same way layout does.
+            // 100.dp, we need to calculate it the same way layout does.
             val viewportSidesPx = with(composeRule.density) { 300.dp.roundToPx() }
             val contentSidesPx = with(composeRule.density) { 400.dp.roundToPx() }
             val maxOffsetPx = (contentSidesPx - viewportSidesPx).toFloat()
