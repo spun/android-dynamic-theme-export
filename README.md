@@ -1,4 +1,3 @@
- 
 # Dynamic theme export
 
 This simple Compose app allows you to preview and export the available colors from your device's current dynamic theme. Use these colors as the starting point to create a new theme for your application.
@@ -16,17 +15,17 @@ This simple Compose app allows you to preview and export the available colors fr
 
 Use the **Preview** tab to explore all available [Color Roles](https://m3.material.io/styles/color/roles) for the current dynamic theme.
 
-<video src="https://github.com/spun/android-dynamic-theme-export/assets/1004332/ad37bf1f-03b1-4e07-b354-b9e039e5f600" width=200 controls="true" muted="true" loop="true"></video>
+<video src="https://github.com/user-attachments/assets/9fa3c891-8afe-4fa8-bfc0-fb19b14ff2a2" width=200 controls="true" muted="true" loop="true"></video>
 
 Change your device's wallpaper to discover a theme you like, and use it as the foundation for your new theme.
 
-<video src="https://github.com/spun/android-dynamic-theme-export/assets/1004332/960e8fba-e13c-419e-a66e-8c5b7d74484a" width=200 controls="true" muted="true" loop="true"></video>
+<video src="https://github.com/user-attachments/assets/36a0c466-a684-46b8-b01f-6f2b2222f104" width=200 controls="true" muted="true" loop="true"></video>
 
 ### Export current theme
 
 Use the **Export** tab to copy all the dynamic theme values as [Material3 Compose ColorSchemes](https://developer.android.com/reference/kotlin/androidx/compose/material3/ColorScheme).
 
-<video src="https://github.com/spun/android-dynamic-theme-export/assets/1004332/a722dbc2-6804-4512-9f0d-3359daa6b58e" width=200 controls="true" muted="true" loop="true"></video>
+<video src="https://github.com/user-attachments/assets/5f796d99-0c0e-45f6-9066-fb83e0421c77" width=200 controls="true" muted="true" loop="true"></video>
 
 ## TODO
 
