@@ -80,10 +80,18 @@ fun PreviewGridScreen() {
 
     Grid(
         config = {
-            // Split
+            // 1. Define tracks
             repeat(2) { column(GridTrackSize.MinContent) }
             repeat(5) { row(GridTrackSize.MinContent) }
             gap(ColorTableSectionPadding)
+            // 2. Map Semantic Strings to coordinates
+            area("primarySecondaryTertiary", row = 1, column = 1)
+            area("errors", row = 1, column = 2)
+            area("fixedPrimarySecondaryTertiary", row = 2, column = 1)
+            area("surfaces", row = 3, column = 1)
+            area("inverse", row = 3, column = 2)
+            area("deprecated", row = 4, column = 1)
+            area("legacyElevatedSurfaces", row = 5, column = 1)
         },
         modifier = Modifier
             .panZoom(rememberPanZoomState())
@@ -92,32 +100,32 @@ fun PreviewGridScreen() {
     ) {
         PrimarySecondaryTertiarySection(
             onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 1, column = 1)
+            modifier = Modifier.gridItem(areaId = "primarySecondaryTertiary")
         )
         ErrorsSection(
             onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 1, column = 2)
+            modifier = Modifier.gridItem(areaId = "errors")
         )
         FixedPrimarySecondaryTertiarySection(
             onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 2, column = 1)
+            modifier = Modifier.gridItem(areaId = "fixedPrimarySecondaryTertiary")
         )
         SurfacesSection(
             onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 3, column = 1)
+            modifier = Modifier.gridItem(areaId = "surfaces")
         )
         InverseSection(
             onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 3, column = 2)
+            modifier = Modifier.gridItem(areaId = "inverse")
         )
         DeprecatedSection(
             onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 4, column = 1)
+            modifier = Modifier.gridItem(areaId = "deprecated")
         )
         LegacyElevatedSurfacesSection(
             colors = elevatedSurfaceLevels,
             onCopy = { scope.launch { onCopy(it) } },
-            modifier = Modifier.gridItem(row = 5, column = 1)
+            modifier = Modifier.gridItem(areaId = "legacyElevatedSurfaces")
         )
     }
 }
