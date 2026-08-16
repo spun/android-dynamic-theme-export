@@ -256,6 +256,9 @@ class PanZoomState(
      * which it hits.
      * With a stretch overscroll effect this is less noticeable, but you can still tell that
      * something has stopped moving sooner than it should.
+     * NOTE: To check this with the overscroll effect, we would need to update our panZoom modifier
+     *  to receive an OverscrollEffect and use it in scrollable2D and also in the overscroll
+     *  modifier we would need to add to our Modifier.panZoom() implementation.
      */
     private val consumedScrollable2DCallback: (Offset) -> Offset = { delta ->
         // Don't fight the zoom animation for control of offset
