@@ -45,8 +45,8 @@ import com.spundev.dynamicthemeexport.ui.preview.components.ColorBlockWithFixedA
 import com.spundev.dynamicthemeexport.ui.preview.components.DefaultColorBlockStyle
 import com.spundev.dynamicthemeexport.ui.preview.components.ForceSmallColorBlockStyle
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
-import com.spundev.dynamicthemeexport.util.panZoom.panZoom
-import com.spundev.dynamicthemeexport.util.panZoom.rememberPanZoomState
+import com.spundev.dynamicthemeexport.util.gestures.panZoom.panZoom
+import com.spundev.dynamicthemeexport.util.gestures.panZoom.rememberPanZoomState
 import kotlinx.coroutines.launch
 
 @Composable

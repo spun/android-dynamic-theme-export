@@ -64,8 +64,8 @@ import com.spundev.dynamicthemeexport.data.ThemeColorPack
 import com.spundev.dynamicthemeexport.data.ThemeExport
 import com.spundev.dynamicthemeexport.ui.theme.DynamicExportTheme
 import com.spundev.dynamicthemeexport.util.DisplayCorners
-import com.spundev.dynamicthemeexport.util.freeScroll.freeScroll
-import com.spundev.dynamicthemeexport.util.freeScroll.rememberFreeScrollState
+import com.spundev.dynamicthemeexport.util.gestures.freeScroll.freeScroll
+import com.spundev.dynamicthemeexport.util.gestures.freeScroll.rememberFreeScrollState
 import com.spundev.dynamicthemeexport.util.rememberDisplayCorners
 import kotlinx.coroutines.launch
 

@@ -1,4 +1,4 @@
-package com.spundev.dynamicthemeexport.util.panZoom
+package com.spundev.dynamicthemeexport.util.gestures.panZoom
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -16,7 +16,7 @@ import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.util.fastAny
-import com.spundev.dynamicthemeexport.util.PanLayoutElement
+import com.spundev.dynamicthemeexport.util.gestures.PanLayoutElement
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.abs

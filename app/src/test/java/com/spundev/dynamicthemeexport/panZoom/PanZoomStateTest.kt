@@ -5,7 +5,7 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
-import com.spundev.dynamicthemeexport.util.panZoom.PanZoomState
+import com.spundev.dynamicthemeexport.util.gestures.panZoom.PanZoomState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test

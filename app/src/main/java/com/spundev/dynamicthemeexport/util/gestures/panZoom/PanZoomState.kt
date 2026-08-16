@@ -1,4 +1,4 @@
-package com.spundev.dynamicthemeexport.util.panZoom
+package com.spundev.dynamicthemeexport.util.gestures.panZoom
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
@@ -15,10 +15,11 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.center
 import androidx.compose.ui.unit.toOffset
-import com.spundev.dynamicthemeexport.util.BasePanState
+import com.spundev.dynamicthemeexport.util.gestures.BasePanState
 import kotlin.math.max
 
 /**
@@ -171,7 +172,7 @@ class PanZoomState(
             // Recover a 0..1 progress position from the scale itself so "screenPos" follows the
             // scale animation.
             val progress = (currentScale - initialScale) / (newScale - initialScale)
-            val screenPos = androidx.compose.ui.geometry.lerp(
+            val screenPos = lerp(
                 centroid,
                 finalScreenPos,
                 progress

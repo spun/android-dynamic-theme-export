@@ -1,4 +1,4 @@
-package com.spundev.dynamicthemeexport.util
+package com.spundev.dynamicthemeexport.util.gestures
 
 import androidx.compose.foundation.gestures.Scrollable2DState
 import androidx.compose.runtime.Stable

@@ -1,11 +1,11 @@
-package com.spundev.dynamicthemeexport.util.freeScroll
+package com.spundev.dynamicthemeexport.util.gestures.freeScroll
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.geometry.Offset
-import com.spundev.dynamicthemeexport.util.BasePanState
+import com.spundev.dynamicthemeexport.util.gestures.BasePanState
 
 /**
  * Create and remember a [FreeScrollState] instance.

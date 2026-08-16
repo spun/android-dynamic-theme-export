@@ -13,6 +13,9 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.pinch
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.dp
+import com.spundev.dynamicthemeexport.util.gestures.panZoom.PanZoomState
+import com.spundev.dynamicthemeexport.util.gestures.panZoom.panZoom
+import com.spundev.dynamicthemeexport.util.gestures.panZoom.rememberPanZoomState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule

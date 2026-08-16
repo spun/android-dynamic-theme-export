@@ -1,4 +1,4 @@
-package com.spundev.dynamicthemeexport.util
+package com.spundev.dynamicthemeexport.util.gestures
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin

@@ -1,12 +1,12 @@
-package com.spundev.dynamicthemeexport.util.freeScroll
+package com.spundev.dynamicthemeexport.util.gestures.freeScroll
 
 import androidx.compose.foundation.gestures.scrollable2D
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import com.spundev.dynamicthemeexport.util.PanLayoutElement
+import com.spundev.dynamicthemeexport.util.gestures.PanLayoutElement
 
 /**
- * Utility modifier that combines all necessary steps to use a [Modifier.scrollable2D].
+ * Utility modifier to simplify the use of [scrollable2D].
  */
 fun Modifier.freeScroll(
     state: FreeScrollState,
