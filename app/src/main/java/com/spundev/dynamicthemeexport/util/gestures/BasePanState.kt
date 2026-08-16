@@ -44,13 +44,20 @@ abstract class BasePanState {
      * Update both [viewportSize] and [contentSize] values.
      * This will also make sure the [offset] boundaries are applied.
      */
-    internal open fun updateSizes(viewport: IntSize, content: IntSize) {
+    internal fun updateSizes(viewport: IntSize, content: IntSize) {
         if (viewport == viewportSize && content == contentSize) return
+        onSizesChanged(viewport, content)
         viewportSize = viewport
         contentSize = content
         // Re-apply constraints with the new sizes in case they are necessary.
         offset = clamp(offset, scale)
     }
+
+    /**
+     * Called whenever [viewportSize] or [contentSize] change.
+     * This can be used as a hook for subclasses that need to recompute size-dependent values.
+     */
+    protected open fun onSizesChanged(viewport: IntSize, content: IntSize) {}
 
     /**
      * Modify [raw] [offset] changes so the content always stays within the boundaries of our

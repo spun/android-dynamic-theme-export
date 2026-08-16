@@ -84,21 +84,17 @@ class PanZoomState(
     }
 
     /**
-     * Update both [viewportSize] and [contentSize] values.
-     * This will also update the [minZoom] value and make sure the [offset] boundaries are applied.
+     * Update [minZoom] value after a [viewportSize] or [contentSize] change.
      */
-    override fun updateSizes(viewport: IntSize, content: IntSize) {
-        if (viewport != viewportSize || content != contentSize) {
-            minZoom = if (content != IntSize.Zero && viewport != IntSize.Zero) {
-                minOf(
-                    viewport.width / content.width.toFloat(),
-                    viewport.height / content.height.toFloat()
-                )
-            } else 1f
-            // Re-apply constraints with the new sizes in case they are necessary.
-            scale = scale.coerceAtLeast(minZoom)
-        }
-        super.updateSizes(viewport, content)
+    override fun onSizesChanged(viewport: IntSize, content: IntSize) {
+        minZoom = if (content != IntSize.Zero && viewport != IntSize.Zero) {
+            minOf(
+                viewport.width / content.width.toFloat(),
+                viewport.height / content.height.toFloat()
+            )
+        } else 1f
+        // Re-apply constraints with the new sizes in case they are necessary.
+        scale = scale.coerceAtLeast(minZoom)
     }
 
     /**
