@@ -4,10 +4,11 @@ This simple Compose app allows you to preview and export the available colors fr
 
 ## How to install
 
-- **Option 1:** Download the [latest APK from the releases page](https://github.com/spun/android-dynamic-theme-export/releases/latest).
-- **Option 2:** Clone the repository and run the app like any other Android project.
+- **Option 1:** Install [from Play Store](https://play.google.com/store/apps/details?id=com.spundev.dynamicthemeexport).
+- **Option 2:** Download the [latest APK from the releases page](https://github.com/spun/android-dynamic-theme-export/releases/latest).
+- **Option 3:** Clone the repository and run the app like any other Android project.
 
-**NOTE:** This app depends on dynamic themes to work and it can only be installed on devices running [Android 12 (API level 31) or higher](https://developer.android.com/develop/ui/views/theming/dynamic-colors).
+**NOTE:** This app depends on dynamic themes to work, and it can only be installed on devices running [Android 12 (API level 31) or higher](https://developer.android.com/develop/ui/views/theming/dynamic-colors).
 
 ## How to use
 
@@ -29,5 +30,4 @@ Use the **Export** tab to copy all the dynamic theme values as [Material3 Compos
 
 ## TODO
 
-- [ ] Fix Preview zoom
-- [ ] Export as xml file? (views)
+- [ ] Export preview table as image
