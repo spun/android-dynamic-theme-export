@@ -1,13 +1,18 @@
 package com.spundev.dynamicthemeexport.util
 
 import android.view.MotionEvent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.IndicationNodeFactory
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.material3.ripple
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -17,7 +22,9 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.SuspendingPointerInputModifierNode
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.isOutOfBounds
+import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.DelegatingNode
+import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.platform.InspectorInfo
@@ -25,6 +32,7 @@ import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
+import kotlinx.coroutines.launch
 
 /**
  * Add long-click listener that doesn't consume pointer events.
@@ -73,10 +81,14 @@ private class TransparentLongClickNode(
     var onLongClick: () -> Unit,
 ) : DelegatingNode(), SemanticsModifierNode {
 
+    override val shouldMergeDescendantSemantics: Boolean
+        get() = true
+
     private val interactionSource = MutableInteractionSource()
 
+    private val indicationNode = delegate(SimplePressIndication.create(interactionSource))
     // Use ripple().create() to build the node wired to our interactionSource.
-    private val indicationNode = delegate(ripple().create(interactionSource))
+    // private val indicationNode = delegate(ripple().create(interactionSource))
 
     // Long-click listener
     private val pointerInputNode = delegate(
@@ -191,3 +203,50 @@ private sealed class LongPressResult {
 
 private val PointerEvent.isDeepPress: Boolean
     get() = classification == MotionEvent.CLASSIFICATION_DEEP_PRESS
+
+// ---
+
+/**
+ * Create custom press indication node
+ */
+private object SimplePressIndication : IndicationNodeFactory {
+
+    override fun create(interactionSource: InteractionSource): DelegatableNode =
+        SimplePressIndicationNode(interactionSource)
+
+    override fun equals(other: Any?): Boolean = other === this
+
+    override fun hashCode(): Int = System.identityHashCode(this)
+}
+
+/**
+ * Node that listens to press events and draws the overlay on top.
+ */
+private class SimplePressIndicationNode(
+    private val interactionSource: InteractionSource
+) : Modifier.Node(), DrawModifierNode {
+
+    // controls the opacity of the overlay
+    private val alpha = Animatable(0f)
+
+    override fun onAttach() {
+        coroutineScope.launch {
+            interactionSource.interactions.collect { interaction ->
+                when (interaction) {
+                    is PressInteraction.Press ->
+                        alpha.animateTo(0.12f, animationSpec = tween(durationMillis = 60))
+
+                    is PressInteraction.Release, is PressInteraction.Cancel ->
+                        alpha.animateTo(0f, animationSpec = tween(durationMillis = 120))
+                }
+            }
+        }
+    }
+
+    override fun ContentDrawScope.draw() {
+        drawContent()
+        if (alpha.value > 0f) {
+            drawRect(color = Color.Black.copy(alpha = alpha.value))
+        }
+    }
+}
