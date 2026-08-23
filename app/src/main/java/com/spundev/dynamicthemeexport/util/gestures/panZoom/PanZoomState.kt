@@ -122,7 +122,7 @@ class PanZoomState(
     ) {
         // Scale
         val defaultScale = max(1f, minZoom)
-        val zoomedInScale = defaultScale * 4f
+        val zoomedInScale = defaultScale * 2.5f
         val initialScale = scale
         val newScale = if (initialScale <= defaultScale * 1.01f) zoomedInScale else defaultScale
 
