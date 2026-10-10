@@ -1,5 +1,5 @@
 [versions]
-agp = "9.4.1"
+agp = "9.5.0-alpha08"
 androidxActivity = "1.13.0"
 androidxComposeBom = "2026.09.00"
 androidxEspresso = "3.7.0"
@@ -24,4 +24,3 @@ screenshot-validation-api = { group = "com.android.tools.screenshot", name = "sc
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot" }
