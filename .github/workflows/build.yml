@@ -46,7 +46,7 @@ jobs:
         run: ./gradlew test
 
       - name: Run screenshot tests 📸
-        run: ./gradlew validateDebugScreenshotTest
+        run: ./gradlew testDebugScreenshotTestDefaultTestSuite
 
       # Extra parameters added from b/287312019.
       # Removed swiftshader_indirect since it should be unnecessary after "Enable KVM group perms"¿?
