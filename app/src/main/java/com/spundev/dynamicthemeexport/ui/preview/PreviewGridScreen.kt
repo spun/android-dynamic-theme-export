@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalGridApi::class)
-
 package com.spundev.dynamicthemeexport.ui.preview
 
 import android.content.ClipData
@@ -8,7 +6,6 @@ import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalGridApi
 import androidx.compose.foundation.layout.Grid
 import androidx.compose.foundation.layout.GridTrackSize
 import androidx.compose.foundation.layout.Row
